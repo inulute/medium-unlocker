@@ -10,9 +10,17 @@ export default async function handler(req, res) {
     try {
         const response = await fetch(googleCacheUrl);
         let html = await response.text();
+        
 
-        // Strip out the header HTML using regular expressions
+        // Remove the "Cached" header
         html = html.replace(/<div id="bN015htcoyT__google-cache-hdr">[\s\S]*?<\/div>/, '');
+
+        // Remove the "View source" link
+        html = html.replace(/<span>\s*View source\s*<\/span>/gi, '');
+        html = html.replace(/<span>\s*Text-only version\s*<\/span>/gi, '');
+
+        // Align remaining content to the center
+        html = html.replace(/<div><span style="display:inline-block;margin-top:8px;margin-right:104px;white-space:nowrap">/, '<div style="text-align: center;">');
 
         res.status(200).send(html);
     } catch (error) {
