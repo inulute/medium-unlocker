@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Medium Unlocker</title>
+    <meta name="description" content="Unlock Medium articles for free using this tool.">
+    <meta name="keywords" content="medium, unlock, article, free, tool, google webcache?url, inulute medium unlocker, medium unlocker, free medium reader, unlock medium, medium pro, how to read medium membler article">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 97%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-block; /* Ensure button remains visible */
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #contentContainer {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: left;
+            overflow: auto;
+        }
+
+        .disclaimer,
+.tool-info {
+    text-align: left;
+    margin-top: 20px;
+    padding: 10px;
+
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+
+.disclaimer p,
+.tool-info p {
+    margin: 0;
+    font-size: 14px; /* Adjust font size as needed */
+    color: #333; /* Adjust text color as needed */
+}
+
+
+        .footer {
+        position: sticky;
+      bottom: 0;
+      text-align: center;
+      background-color: #616161;
+      color: #fff;
+      padding: 0.5rem 0;
+
+    }
+
+    .footer p {
+      margin: 0;
+    }
+
+    .footer a {
+      color: #ffffff;
+      text-decoration: none;
+    }
+    
+
+        /* Media query for responsiveness */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 90%;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Medium Unlocker</h2>
+    <input type="text" id="urlInput" placeholder="Enter URL">
+    <button onclick="search()">Unlock</button>
+    <div id="contentContainer">
+        <!-- Returned content will be displayed here -->
+    </div>
+
+    <div class="disclaimer">
+        <p>This tool is for educational purposes only. We do not encourage any illegal activities.</p>
+    </div>
+    
+    <div class="tool-info">
+        <p>If you find this tool helpful, please consider <a href="https://www.buymeacoffee.com/inulute" style="color: lightblue;">buying me a coffee ☕</a>.</p> 
+        <br>
+        <p>If you have any suggestions or feedback, please feel free to <a href="https://socials.inulute.com" style="color: lightblue;">contact me</a>.</p>
+        <br>
+        <p>Please note that this tool uses Google Webcache to display Medium articles, so it may not always reflect the most up-to-date content.</p>
+    </div>
+
+</div>
+<footer class="footer">
+    <p style="font-size: small;">Made with ❤️ by <a href="https://socials.inulute.com" style="color: lightblue;">inulute</a></p>
+  </footer>
+
+<script>
+    async function search() {
+        const inputUrl = document.getElementById("urlInput").value.trim();
+        if (!inputUrl) {
+            alert("Please enter a valid URL.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/webcache?url=${inputUrl}`);
+            const html = await response.text();
+            document.getElementById("contentContainer").innerHTML = html;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            document.getElementById("contentContainer").innerHTML = "<p>Error fetching content. Please try again later.</p>";
+        }
+    }
+</script>
+
+</body>
+</html>
