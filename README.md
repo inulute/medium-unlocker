@@ -14,7 +14,7 @@ Medium Unlocker is a web tool designed to access Medium articles without any pay
 
 ## How to Use
 
-1. Visit the [Medium Unlocker](https://medium-unlock.inulute.com) website.
+1. Visit the [Medium Unlocker](https://medium-unlocker.inulute.com) website.
 2. Enter the URL of the Medium article you want to unlock in the provided input field.
 3. Click on the "Unlock" button.
 4. The tool will fetch and display the content of the article without any paywalls.
