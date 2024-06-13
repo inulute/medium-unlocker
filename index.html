@@ -7,7 +7,13 @@
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
-<script defer src="/_vercel/insights/script.js"></script>
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "mrdnkwdil6");
+</script>
     <title>Medium Unlocker</title>
     <meta name="description" content="Unlock Medium articles for free using this tool.">
     <meta name="keywords" content="medium, unlock, article, free, tool, google webcache?url, inulute medium unlocker, medium unlocker, free medium reader, unlock medium, medium pro, how to read medium membler article">
@@ -85,7 +91,6 @@
     text-align: left;
     margin-top: 20px;
     padding: 10px;
-
     border-radius: 5px;
     background-color: #ffffff;
 }
@@ -105,7 +110,6 @@
       background-color: #616161;
       color: #fff;
       padding: 0.5rem 0;
-
     }
 
     .footer p {
@@ -117,6 +121,43 @@
       text-decoration: none;
     }
     
+    /* Privacy Policy Popup Styles */
+    .popup {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .popup-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .popup-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .popup-close:hover,
+    .popup-close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
 
         /* Media query for responsiveness */
         @media only screen and (max-width: 600px) {
@@ -153,11 +194,40 @@
     </div>
 
 </div>
+
 <footer class="footer">
     <p style="font-size: small;">Made with ❤️ by <a href="https://socials.inulute.com" style="color: lightblue;">inulute</a></p>
-  </footer>
+    ------------------
+    <p style="font-size: small;"><a href="#" style="color: lightblue;" onclick="openPrivacyPolicy()">Privacy Policy</a></p>
+</footer>
+
+<!-- Privacy Policy Popup -->
+<div id="privacyPolicyPopup" class="popup">
+    <div class="popup-content">
+        <span class="popup-close" onclick="closePrivacyPolicy()">&times;</span>
+
+
+
+<h2>Privacy Policy</h2>
+<h3>Effective Date: 13 June 2024</h3>
+<p>Hey there! Just a quick heads-up about our privacy policy. We want to know how many awesome people visit our site, but our free Vercel analytics limit ran out, and we didn't feel like paying $20 for an upgrade. So, we're using Microsoft Clarity to get some basic visitor insights instead. :( </p>
+<p>If you're curious about how Microsoft handles your data, check out their <a href="https://privacy.microsoft.com/en-us/privacystatement" target="_blank" style="color: lightblue;">Privacy Statement</a>.</p>
+
+
+        
+        
+    </div>
+</div>
 
 <script>
+    function openPrivacyPolicy() {
+        document.getElementById('privacyPolicyPopup').style.display = 'block';
+    }
+
+    function closePrivacyPolicy() {
+        document.getElementById('privacyPolicyPopup').style.display = 'none';
+    }
+
     async function search() {
         const inputUrl = document.getElementById("urlInput").value.trim();
         if (!inputUrl) {
