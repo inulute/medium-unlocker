@@ -1,2 +1,32 @@
 .vercel
 node_modules
+
+# Android build artifacts
+android/.gradle/
+android/build/
+android/app/build/
+
+# Android local config
+local.properties
+*.keystore
+
+# Web build artifacts
+website/node_modules/
+website/dist/
+website/build/
+
+# Logs
+*.log
+
+# Env/config secrets
+.env
+.env.*
+
+# IDE/editor files
+.idea/
+*.iml
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Medium Unlocker</string>
+    <string name="paste_url_hint">Paste Medium URL here</string>
+    <string name="unlock_button">Unlock Article</string>
+    <string name="about_title">About</string>
+    <string name="about_message">Medium Unlocker helps you read Medium articles without restrictions by redirecting them through freedium.cfd.\n\nShare any Medium link to this app or paste it directly!</string>
+    <string name="invalid_url">Please enter a valid Medium URL</string>
+    <string name="loading">Loading article...</string>
+    <string name="error_title">Oops!</string>
+    <string name="error_message">Something went wrong loading the article. Please try again.</string>
+    <string name="retry">Retry</string>
+    <string name="share_app">Share App</string>
+    <string name="open_browser">Open in Browser</string>
+</resources>

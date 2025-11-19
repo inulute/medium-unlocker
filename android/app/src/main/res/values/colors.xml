@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ultra-modern dark theme palette inspired by premium portfolios -->
+
+    <!-- Primary Colors -->
+    <color name="primary">#FFFFFF</color>
+    <color name="primary_dark">#F5F5F5</color>
+    <color name="accent">#3B82F6</color>
+    <color name="accent_light">#60A5FA</color>
+
+    <!-- Backgrounds -->
+    <color name="background">#050505</color>
+    <color name="surface">#0A0A0A</color>
+    <color name="card">#0F0F0F</color>
+    <color name="secondary">#1A1A1A</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A3A3A3</color>
+    <color name="text_muted">#737373</color>
+
+    <!-- Borders & Dividers -->
+    <color name="border">#262626</color>
+    <color name="border_light">#404040</color>
+
+    <!-- Status Colors -->
+    <color name="success">#22C55E</color>
+    <color name="error">#EF4444</color>
+    <color name="warning">#F59E0B</color>
+    <color name="info">#3B82F6</color>
+
+    <!-- Light theme (for day mode) -->
+    <color name="light_background">#FFFFFF</color>
+    <color name="light_surface">#F5F5F5</color>
+    <color name="light_card">#FFFFFF</color>
+    <color name="light_text_primary">#0A0A0A</color>
+    <color name="light_text_secondary">#525252</color>
+    <color name="light_border">#E5E5E5</color>
+
+    <!-- Overlay & Shadows -->
+    <color name="overlay">#80000000</color>
+    <color name="spotlight">#1AFFFFFF</color>
+    <color name="shadow">#26000000</color>
+
+    <!-- Transparent -->
+    <color name="transparent">#00000000</color>
+</resources>

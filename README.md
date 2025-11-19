@@ -1,71 +1,141 @@
 <div align='center'>
-<img src="assets/medium_unlock_logo.svg" style="height: 60px;" alt="Medium Unlocker Logo">
+  <img src="assets/medium_unlock_logo.svg" alt="Medium Unlocker Logo" height="80">
 
 # Medium Unlocker
-Easily access Medium articles without any paywalls.
+
+**End-to-end paywall bypasser built from scratch around the freedium.cfd index.**
 
 <a href="https://medium-unlocker.inulute.com/">
-    <img src="https://img.shields.io/badge/Visit-Here-brightgreen?style=for-the-badge" alt="Website Badge">
-   </a>
-   <br><br>
-
-<a> <img src="https://img.shields.io/github/followers/inulute.svg?style=social&label=Follow&maxAge=2592000" alt="Followers Badge"> <img src="https://img.shields.io/github/stars/inulute/medium-unlocker.svg" alt="Star Badge">
+  <img src="https://img.shields.io/badge/Visit-Website-brightgreen?style=for-the-badge" alt="Website Badge">
+</a>
+<a href="https://github.com/inulute/medium-unlocker/releases/latest">
+  <img src="https://img.shields.io/badge/Download-Android%20App-blue?style=for-the-badge" alt="Download Badge">
 </a>
 
+<br><br>
+
+<a href="https://github.com/inulute/medium-unlocker/stargazers">
+  <img src="https://img.shields.io/github/stars/inulute/medium-unlocker?style=social" alt="Stars">
+</a>
+<a href="https://github.com/inulute">
+  <img src="https://img.shields.io/github/followers/inulute?style=social&label=Follow" alt="Followers">
+</a>
 </div>
 
+## ✨ Features
 
+## Project Background
 
+- Medium’s “3 free reads” wall is frustrating for casual browsing.  
+- freedium.cfd hosts publicly cached versions of Medium stories, but there was no polished way to reach them.  
+- Medium Unlocker bridges that gap with a custom UI, tailored network stack, and automation that lets readers paste or share a Medium URL and instantly open the matching freedium mirror.
 
+---
 
-## Features
+## Feature Highlights
 
-- **Unlock Articles:** Enter the URL of the Medium article, and the tool fetches and displays it for free.
-- **Educational Use:** This tool is for educational purposes only. Illegal activities are not encouraged.
-- **Feedback & Support:** Have suggestions or issues? [Contact us](https://socials.inulute.com). We're open to feedback.
+### Web
+- **Purpose-built frontend** – React 18 SPA with a bespoke dark interface.
+- **URL normalizer** – Cleans Medium query noise and rewrites the slug for freedium.
+- **Result inspector** – Shows whether the article was fetched from cache or proxied live.
+- **Share-ready links** – Generates clean freedium URLs you can copy anywhere.
 
-## How to Use
+### Android
+- **Native shell** – Java + WebView with Material Design 3 styling.
+- **One-tap share target** – Appears inside the Android share sheet for any Medium link.
+- **Inline resolver** – Performs the same URL normalization on-device, then loads freedium in a hardened WebView.
+- **Network extras** – Optional DoH, proxy toggles, custom SSL pinning for freedium’s cert chain.
+- **Tiny footprint** – <3 MB release APK.
 
-1. Visit [Medium Unlocker](https://medium-unlocker.inulute.com).
-2. Enter the Medium article URL.
-3. Click the "Unlock" button.
-4. Read the article without paywalls.
+---
 
-> [!NOTE]
-> It may not work for all articles, especially those not indexed by Google Webcache.
+## Quick Start
+
+### Web
+1. Go to [medium-unlocker.inulute.com](https://medium-unlocker.inulute.com).
+2. Paste any Medium article URL.
+3. Hit **Unlock** and read the freedium mirror.
+
+### Android
+1. [Grab the latest APK](https://github.com/inulute/medium-unlocker/releases/latest).
+2. Install (you may need to allow side-loading).
+3. Either:
+   - Share a Medium link and pick **Medium Unlocker**, or
+   - Open the app, paste a URL, tap **Unlock**.
+
+---
+
+## Tech Stack
+
+| Layer        | Stack                                                                 |
+|--------------|----------------------------------------------------------------------|
+| Web          | React 18, Vite tooling, CSS Modules, Inter font, Cloudflare Pages    |
+| Android      | Java, Material 3, OkHttp, WebView   |
+
+---
+
+## Disclaimer
 
 > [!WARNING]
-> For educational purposes only. Misuse is not the developer's responsibility.
-
-## 📢 Feedback & Contributions
-
-Your feedback and contributions are welcome! Report issues or submit ideas via GitHub.
-
-## Support & Donations ❣️
-
-<div align="center">
-  <a href="https://ko-fi.com/inulute">
-    <img height='41' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' alt='Buy Me a Coffee at ko-fi.com'>
-  </a>
-  <a href="https://paypal.me/inulute">
-    <img src="./assets/payment/paypal.svg" alt="PayPal" height="38">
-  </a>
-  <a href="https://upi.inulute.com/">
-    <img src="./assets/payment/upi.svg" alt="UPI Pay" height="38">
-  </a>
-</div>
+> Educational use only. You are responsible for respecting Medium’s Terms of Service and regional laws. This project does not host Medium content; it automates requests to freedium.cfd.
 
 > [!NOTE]
-> UPI is available for Indian users only.
+> freedium.cfd is a public mirror. Its uptime, indexing speed, and article availability are outside my control.
 
-## 📝 License
+> [!WARNING]
+> **For Educational Purposes Only**
+>
+> This tool is provided for educational purposes to demonstrate web scraping and proxy techniques. Users are responsible for complying with Medium's Terms of Service and applicable laws. The developers are not responsible for any misuse.
 
-Released under the MIT License.
+> [!NOTE]
+> **Service Availability**
+>
+> This tool relies on freedium.cfd, a third-party service. Availability and functionality may vary. Some articles may not be accessible if not indexed by the service.
+
+---
+
+## 🤝 Contributing
+
+## Feedback & Support
+
+- Issues: [GitHub Issues](https://github.com/inulute/medium-unlocker/issues)
+- Ideas: [Discussions](https://github.com/inulute/medium-unlocker/discussions)
+- Contact: [socials.inulute.com](https://socials.inulute.com)
+- Helpdesk: [support.inulute.com](https://support.inulute.com)
+
+---
+
+## Donate
 
 <div align="center">
-  <a href="https://github.com/inulute/ai-gate/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/inulute/ai-gate?style=for-the-badge" alt="License">
+  <a href="https://support.inulute.com/donate">
+    <img src="https://img.shields.io/badge/Donate-Support-brightgreen?style=for-the-badge" alt="Donate Badge">
   </a>
 </div>
 
 ---
+
+## License
+
+MIT License – see [`LICENSE`](https://github.com/inulute/medium-unlocker/blob/main/LICENSE) for details.
+
+<div align="center">
+  <img src="https://img.shields.io/github/license/inulute/medium-unlocker?style=for-the-badge" alt="License Badge">
+</div>
+
+---
+
+## Credits
+
+- **freedium.cfd** – public cache the project is built around.
+- **Material Design + React teams** – foundational tooling.
+
+---
+
+<div align="center">
+
+**Created by [inulute](https://github.com/inulute)**  
+[Website](https://medium-unlocker.inulute.com) • [Download](https://github.com/inulute/medium-unlocker/releases/latest) • [Support](https://support.inulute.com) • [GitHub](https://github.com/inulute)
+
+</div>
+
