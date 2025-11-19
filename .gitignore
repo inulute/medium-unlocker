@@ -30,3 +30,5 @@ website/build/
 # OS junk
 .DS_Store
 Thumbs.db
+
+keystore.properties

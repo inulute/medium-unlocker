@@ -2,6 +2,15 @@ plugins {
     id 'com.android.application'
 }
 
+import java.io.FileInputStream
+import java.util.Properties
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace 'com.inulute.mediumunlocker'
     compileSdk 34
@@ -14,11 +23,34 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            release {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "release") {
+            variant.outputs.each { output ->
+                def resolvedVersion = variant.versionName ?: variant.mergedFlavor?.versionName ?: variant.versionCode
+                output.outputFileName = "MediumUnlocker_v${resolvedVersion}.apk"
+            }
         }
     }
 
