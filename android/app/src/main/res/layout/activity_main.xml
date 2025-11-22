@@ -23,13 +23,28 @@
             android:paddingTop="24dp"
             android:paddingBottom="40dp">
 
-            <!-- Top Bar with Support and GitHub -->
+            <!-- Top Bar with Update, Support and GitHub -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
                 android:gravity="end"
                 android:orientation="horizontal">
+
+                <!-- Update Button (hidden by default) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/updateButton"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Update Available"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_update"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/primary" />
 
                 <!-- Support Button -->
                 <com.google.android.material.button.MaterialButton
