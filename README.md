@@ -44,7 +44,6 @@
 - **Native shell** – Java + WebView with Material Design 3 styling.
 - **One-tap share target** – Appears inside the Android share sheet for any Medium link.
 - **Inline resolver** – Performs the same URL normalization on-device, then loads freedium in a hardened WebView.
-- **Network extras** – Optional DoH, proxy toggles, custom SSL pinning for freedium’s cert chain.
 - **Tiny footprint** – <3 MB release APK.
 
 ---
