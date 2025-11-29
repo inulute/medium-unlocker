@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREF_POPUP_SHOWN_VERSION = "popup_shown_version";
     private static final String PREF_CACHED_VERSION = "cached_latest_version";
     private static final String PREF_LAST_CHECK = "last_update_check";
+    private static final String PREF_USE_MIRROR = "use_mirror";
     private static final long UPDATE_CHECK_INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
 
     private TextInputEditText urlInput;
@@ -224,7 +225,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String convertToFreedium(String mediumUrl) {
-        return "https://freedium.cfd/" + mediumUrl;
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean useMirror = prefs.getBoolean(PREF_USE_MIRROR, true); // Default to true
+        String domain = useMirror ? "freedium-mirror.cfd" : "freedium.cfd";
+        return "https://" + domain + "/" + mediumUrl;
     }
 
     private boolean isMediumUrl(String url) {

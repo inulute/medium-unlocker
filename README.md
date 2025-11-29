@@ -44,6 +44,8 @@
 - **Native shell** – Java + WebView with Material Design 3 styling.
 - **One-tap share target** – Appears inside the Android share sheet for any Medium link.
 - **Inline resolver** – Performs the same URL normalization on-device, then loads freedium in a hardened WebView.
+- **Mirror Support** – Automatically switches to `freedium-mirror.cfd` if the primary server is blocked.
+- **Smart Auto-Retry** – Seamlessly detects connection failures and retries with the mirror server.
 - **Network extras** – Optional DoH, proxy toggles, custom SSL pinning for freedium’s cert chain.
 - **Tiny footprint** – <3 MB release APK.
 

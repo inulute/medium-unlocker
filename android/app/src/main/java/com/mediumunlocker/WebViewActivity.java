@@ -17,6 +17,7 @@ import android.webkit.WebViewClient;
 import android.net.http.SslError;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,6 +40,8 @@ public class WebViewActivity extends AppCompatActivity {
     private MaterialButton retryButton;
     private MaterialButton tryProxyButton;
     private MaterialButton tryAlternativeButton;
+    private android.widget.LinearLayout loadingOverlay;
+    private TextView loadingText;
 
     private String currentUrl;
     private String originalUrl;
@@ -65,7 +68,10 @@ public class WebViewActivity extends AppCompatActivity {
         proxyStatusText = findViewById(R.id.proxyStatusText);
         retryButton = findViewById(R.id.retryButton);
         tryProxyButton = findViewById(R.id.tryProxyButton);
+        tryProxyButton = findViewById(R.id.tryProxyButton);
         tryAlternativeButton = findViewById(R.id.tryAlternativeButton);
+        loadingOverlay = findViewById(R.id.loadingOverlay);
+        loadingText = findViewById(R.id.loadingText);
     }
 
     private void setupToolbar() {
@@ -133,6 +139,9 @@ public class WebViewActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 hideLoading();
+                if (loadingOverlay != null) {
+                    loadingOverlay.setVisibility(View.GONE);
+                }
                 String title = view.getTitle();
                 if (title != null && !title.isEmpty() && !title.startsWith("http")) {
                     toolbar.setTitle(title);
@@ -144,6 +153,28 @@ public class WebViewActivity extends AppCompatActivity {
                 super.onReceivedError(view, request, error);
                 if (request.isForMainFrame()) {
                     hideLoading();
+                    
+                    // Immediately hide WebView to prevent default error page
+                    view.setVisibility(View.GONE);
+                    
+                    // Auto-retry with mirror if using primary domain
+                    String url = request.getUrl().toString();
+                    if (url.contains("freedium.cfd") && !url.contains("freedium-mirror.cfd")) {
+                        Log.d(TAG, "Primary domain failed, switching to mirror...");
+                        
+                        // Show loading overlay instead of Toast
+                        if (loadingOverlay != null) {
+                            loadingOverlay.setVisibility(View.VISIBLE);
+                            if (loadingText != null) {
+                                loadingText.setText("Switching to mirror server...");
+                            }
+                        }
+                        
+                        String mirrorUrl = url.replace("freedium.cfd", "freedium-mirror.cfd");
+                        view.loadUrl(mirrorUrl);
+                        return;
+                    }
+                    
                     showError();
                 }
             }
@@ -164,7 +195,7 @@ public class WebViewActivity extends AppCompatActivity {
                 String url = request.getUrl().toString();
 
                 // Keep freedium and medium navigation in WebView
-                if (url.contains("freedium.cfd") || url.contains("medium.com")) {
+                if (url.contains("freedium.cfd") || url.contains("freedium-mirror.cfd") || url.contains("medium.com")) {
                     return false;
                 }
 
@@ -201,7 +232,35 @@ public class WebViewActivity extends AppCompatActivity {
 
         // Hide proxy buttons - not needed for most users
         tryProxyButton.setVisibility(View.GONE);
-        tryAlternativeButton.setVisibility(View.GONE);
+        
+        // Configure alternative button for mirror
+        tryAlternativeButton.setText("Try Mirror Server");
+        tryAlternativeButton.setVisibility(View.VISIBLE);
+        tryAlternativeButton.setOnClickListener(v -> {
+            if (webView.getUrl() != null) {
+                String current = webView.getUrl();
+                String newUrl;
+                if (current.contains("freedium-mirror.cfd")) {
+                    // If already on mirror, switch back to primary (toggle behavior)
+                    newUrl = current.replace("freedium-mirror.cfd", "freedium.cfd");
+                    if (loadingText != null) loadingText.setText("Switching to primary server...");
+                } else {
+                    // Switch to mirror
+                    newUrl = current.replace("freedium.cfd", "freedium-mirror.cfd");
+                    if (loadingText != null) loadingText.setText("Switching to mirror server...");
+                }
+                
+                if (loadingOverlay != null) loadingOverlay.setVisibility(View.VISIBLE);
+                errorLayout.setVisibility(View.GONE);
+                webView.setVisibility(View.VISIBLE);
+                webView.loadUrl(newUrl);
+            } else if (currentUrl != null) {
+                // Fallback if WebView URL is null
+                String newUrl = currentUrl.replace("freedium.cfd", "freedium-mirror.cfd");
+                webView.loadUrl(newUrl);
+            }
+        });
+        
         blockingInfoCard.setVisibility(View.GONE);
     }
 
