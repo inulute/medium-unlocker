@@ -135,11 +135,64 @@ body {
   color: #FFFFFF;
 }
 
+/* Options Wrapper */
+.options-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.options-wrapper input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  cursor: pointer;
+  accent-color: #FFFFFF;
+  margin: 0;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  background-color: #1A1A1A;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+}
+
+.options-wrapper input[type="checkbox"]:checked {
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.options-wrapper input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #050505;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.options-wrapper input[type="checkbox"]:hover {
+  border-color: #737373;
+}
+
+.options-wrapper label {
+  color: #A3A3A3;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
 /* Button Group */
 .button-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  margin-top: 1.5rem;
 }
 
 .download-button,

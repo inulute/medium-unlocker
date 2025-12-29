@@ -92,15 +92,14 @@ function App() {
             )}
           </div>
 
-          <div className="options-wrapper" style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="options-wrapper">
             <input
               type="checkbox"
               id="mirror-toggle"
               checked={useMirror}
               onChange={(e) => setUseMirror(e.target.checked)}
-              style={{ width: 'auto', margin: 0 }}
             />
-            <label htmlFor="mirror-toggle" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', cursor: 'pointer' }}>
+            <label htmlFor="mirror-toggle">
               Use Mirror Server (freedium-mirror.cfd)
             </label>
           </div>
