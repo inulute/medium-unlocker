@@ -1,0 +1,17 @@
+[build]
+  publish = "build"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Function configuration
+[functions]
+  directory = "netlify/functions"
+
+# Redirects - ensure function routes work
+[[redirects]]
+  from = "/api/github-stats"
+  to = "/.netlify/functions/github-stats"
+  status = 200
+

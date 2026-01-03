@@ -25,8 +25,14 @@ body {
 .top-bar {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 8px;
   margin-bottom: 32px;
+}
+
+.top-bar-buttons {
+  display: flex;
+  gap: 8px;
 }
 
 .icon-button {
@@ -41,11 +47,30 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .icon-button:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: scale(1.05);
+}
+
+.github-button {
+  width: auto;
+  padding: 0 12px;
+  border-radius: 20px;
+  gap: 6px;
+}
+
+.github-button svg {
+  flex-shrink: 0;
+}
+
+.github-stars {
+  font-size: 13px;
+  font-weight: 500;
+  color: #FFFFFF;
+  white-space: nowrap;
 }
 
 /* Main Container */
@@ -211,11 +236,39 @@ body {
   background: transparent;
   color: #FFFFFF;
   border: 1px solid #262626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .download-button:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: #404040;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.button-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+.button-text span:first-child {
+  font-weight: 500;
+}
+
+.button-stats {
+  font-size: 11px;
+  color: #A3A3A3;
+  font-weight: 400;
+  margin-top: 2px;
 }
 
 .unlock-button {
@@ -287,6 +340,10 @@ body {
 
   .button-group {
     grid-template-columns: 1fr;
+  }
+
+  .button-stats {
+    font-size: 10px;
   }
 }
 
