@@ -133,6 +133,10 @@ MIT License – see [`LICENSE`](https://github.com/inulute/medium-unlocker/blob/
 
 ---
 
+<a href="https://github.com/inulute/medium-unlocker">
+    <img src="https://komarev.com/ghpvc/?username=inulute&repo=medium-unlocker&label=Repo%20Views&color=olive&style=pixel&logo=github&abbreviated=true" alt="phantom-lens views" />
+  </a>
+
 <div align="center">
 
 **Created by [inulute](https://github.com/inulute)**  
