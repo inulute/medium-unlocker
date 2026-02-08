@@ -156,13 +156,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Received SEND intent with text: " + sharedText);
             if (sharedText != null) {
                 String url = extractUrl(sharedText);
-                if (url != null && isMediumUrl(url)) {
-                    Log.d(TAG, "Valid Medium URL found in shared text: " + url);
+                if (url != null) {
+                    Log.d(TAG, "URL found in shared text: " + url);
                     processAndOpenUrl(url);
                 } else {
-                    Log.w(TAG, "No valid Medium URL found in shared text");
+                    Log.w(TAG, "No URL found in shared text");
                     urlInput.setText(sharedText);
-                    Toast.makeText(this, "Please paste a valid Medium URL", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please paste a valid URL", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             if (item != null && item.getText() != null) {
                 String clipText = item.getText().toString();
                 String url = extractUrl(clipText);
-                if (url != null && isMediumUrl(url)) {
+                if (url != null) {
                     urlInput.setText(url);
                     urlInput.setSelection(url.length());
                 }
@@ -199,12 +199,6 @@ public class MainActivity extends AppCompatActivity {
             url = extractedUrl;
         }
 
-        if (!isMediumUrl(url)) {
-            Log.w(TAG, "Not a Medium URL: " + url);
-            Toast.makeText(this, getString(R.string.invalid_url), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         processAndOpenUrl(url);
     }
 
@@ -216,6 +210,23 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, WebViewActivity.class);
         intent.putExtra("url", freediumUrl);
         intent.putExtra("originalUrl", mediumUrl);
+        // Pass update info so WebView can show popup on first open (e.g. when opened from share sheet before async check completes)
+        String updateVersion = pendingUpdateVersion;
+        String updateUrl = pendingUpdateUrl;
+        if (updateVersion == null || updateUrl == null) {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            String cachedVersion = prefs.getString(PREF_CACHED_VERSION, "");
+            String skipVersion = prefs.getString(PREF_SKIP_VERSION, "");
+            if (!cachedVersion.isEmpty() && !cachedVersion.equals(skipVersion)
+                    && isNewerVersion(getAppVersion(), cachedVersion)) {
+                updateVersion = cachedVersion;
+                updateUrl = GITHUB_RELEASES_URL;
+            }
+        }
+        if (updateVersion != null && updateUrl != null) {
+            intent.putExtra("update_version", updateVersion);
+            intent.putExtra("update_url", updateUrl);
+        }
         startActivity(intent);
 
         // Clear the input for next use
@@ -231,14 +242,6 @@ public class MainActivity extends AppCompatActivity {
         return "https://" + domain + "/" + mediumUrl;
     }
 
-    private boolean isMediumUrl(String url) {
-        if (url == null || url.isEmpty()) return false;
-
-        String lowerUrl = url.toLowerCase();
-        return lowerUrl.contains("medium.com") ||
-                lowerUrl.matches(".*://[a-zA-Z0-9-]+\\.medium\\.com.*");
-    }
-
     private String extractUrl(String text) {
         if (text == null) return null;
 
@@ -250,11 +253,11 @@ public class MainActivity extends AppCompatActivity {
             return matcher.group(1);
         }
 
-        if (text.toLowerCase().contains("medium.com")) {
+        if (text.contains(".") && !text.contains(" ")) {
             if (!text.startsWith("http")) {
-                return "https://" + text;
+                return "https://" + text.trim();
             }
-            return text;
+            return text.trim();
         }
 
         return null;
@@ -281,6 +284,15 @@ public class MainActivity extends AppCompatActivity {
                     pendingUpdateUrl = GITHUB_RELEASES_URL;
                     updateButton.setVisibility(View.VISIBLE);
                     Log.d(TAG, "Update button visible (from cache)");
+
+                    // Show popup on launch (first time only per version) when using cache
+                    String popupShownVersion = prefs.getString(PREF_POPUP_SHOWN_VERSION, "");
+                    if (!cachedVersion.equals(popupShownVersion)) {
+                        runOnUiThread(() -> {
+                            showUpdateDialog();
+                            prefs.edit().putString(PREF_POPUP_SHOWN_VERSION, cachedVersion).apply();
+                        });
+                    }
                 }
             }
             return;

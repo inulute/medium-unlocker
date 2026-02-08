@@ -1,3 +1,20 @@
+# Release v1.3
+
+## 🚀 New Features
+
+### Medium & Custom Domain URLs
+- **Medium article URLs** – Paste standard `medium.com` links as before.
+- **Custom domain URLs** – Now supports article links from custom domains (e.g. publication subdomains and custom Medium sites).
+- Use any article URL in the app or on the website; both are accepted and routed through Freedium.
+
+## 📋 Misc
+
+- **Update popup** – Update-available dialog now shows on app launch (once per new version) and when opening an article in WebView for the first time; also shown when opening from the share sheet using cached update info.
+- **Launcher icon** – Icon scaled to fit the adaptive-icon safe zone so it no longer gets cropped on circular or squircle launcher masks.
+- **Title font** – “Medium Unlocker.” title is explicitly bold for consistent appearance across devices.
+
+---
+
 # Release v1.2
 
 ## 🚀 New Features

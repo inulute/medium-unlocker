@@ -81,6 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:fontFamily="sans-serif-black"
+                android:textStyle="bold"
                 android:letterSpacing="-0.02"
                 android:lineSpacingMultiplier="0.9"
                 android:text="Medium\nUnlocker."

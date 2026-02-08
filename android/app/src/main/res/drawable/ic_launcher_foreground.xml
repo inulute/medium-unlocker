@@ -5,12 +5,12 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Medium Unlock Logo centered and scaled -->
+    <!-- Medium Unlock Logo: scaled to fit adaptive icon safe zone (center 66%) to avoid cropping on circular/squircle masks -->
     <group
-        android:scaleX="0.04"
-        android:scaleY="0.04"
-        android:translateX="5.5"
-        android:translateY="15.5">
+        android:scaleX="0.024"
+        android:scaleY="0.024"
+        android:translateX="24.65"
+        android:translateY="28.9">
 
         <!-- Main Medium "M" circles -->
         <path

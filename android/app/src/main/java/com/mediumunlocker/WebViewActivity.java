@@ -1,12 +1,17 @@
 package com.inulute.mediumunlocker;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -17,8 +22,6 @@ import android.webkit.WebViewClient;
 import android.net.http.SslError;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -29,6 +32,8 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 public class WebViewActivity extends AppCompatActivity {
 
     private static final String TAG = "WebViewActivity";
+    private static final String PREFS_NAME = "MediumUnlockerPrefs";
+    private static final String PREF_WEBVIEW_POPUP_SHOWN_VERSION = "webview_popup_shown_version";
 
     private WebView webView;
     private LinearProgressIndicator progressBar;
@@ -56,6 +61,58 @@ public class WebViewActivity extends AppCompatActivity {
         setupWebView();
         setupButtons();
         loadUrl();
+        showUpdateDialogIfNeeded();
+    }
+
+    /** Show update popup on first time opening WebView when an update is available (once per version). */
+    private void showUpdateDialogIfNeeded() {
+        Intent intent = getIntent();
+        String updateVersion = intent != null ? intent.getStringExtra("update_version") : null;
+        String updateUrl = intent != null ? intent.getStringExtra("update_url") : null;
+        if (updateVersion == null || updateVersion.isEmpty() || updateUrl == null || updateUrl.isEmpty()) {
+            return;
+        }
+        String shownVersion = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(PREF_WEBVIEW_POPUP_SHOWN_VERSION, "");
+        if (updateVersion.equals(shownVersion)) {
+            return;
+        }
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putString(PREF_WEBVIEW_POPUP_SHOWN_VERSION, updateVersion).apply();
+        showUpdateDialog(updateVersion, updateUrl);
+    }
+
+    private void showUpdateDialog(String version, String url) {
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_update);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
+        dialog.setCancelable(true);
+
+        TextView versionText = dialog.findViewById(R.id.updateVersionText);
+        versionText.setText("v" + version + " is now available");
+
+        MaterialButton skipButton = dialog.findViewById(R.id.updateSkipButton);
+        skipButton.setOnClickListener(v -> dialog.dismiss());
+
+        MaterialButton cancelButton = dialog.findViewById(R.id.updateCancelButton);
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        MaterialButton updateNowButton = dialog.findViewById(R.id.updateNowButton);
+        updateNowButton.setOnClickListener(v -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to open update URL", e);
+            }
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private void initializeViews() {

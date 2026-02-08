@@ -33,19 +33,14 @@ function App() {
   }, []);
 
   const handleUnlock = () => {
-    if (!url.trim()) {
-      alert('Please enter a Medium URL');
-      return;
-    }
-
-    const mediumUrlPattern = /medium\.com/i;
-    if (!mediumUrlPattern.test(url)) {
-      alert('Please enter a valid Medium URL');
+    const inputUrl = url.trim();
+    if (!inputUrl) {
+      alert('Please enter a URL');
       return;
     }
 
     const domain = useMirror ? 'freedium-mirror.cfd' : 'freedium.cfd';
-    const freediumUrl = `https://${domain}/${url}`;
+    const freediumUrl = `https://${domain}/${inputUrl}`;
     window.open(freediumUrl, '_blank');
     setUrl('');
   };
@@ -105,7 +100,7 @@ function App() {
           <div className="input-wrapper">
             <input
               type="text"
-              placeholder="Paste Medium URL here..."
+              placeholder="Paste article URL here..."
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -152,7 +147,7 @@ function App() {
         <div className="info-card">
           <h3>How it works</h3>
           <ul>
-            <li>Paste any Medium URL above</li>
+            <li>Paste any article URL above (Medium or custom domain)</li>
             <li>Click "Unlock Article" to bypass the paywall</li>
             <li>Automatically routes through freedium.cfd</li>
             <li>Download the Android app for mobile access</li>
