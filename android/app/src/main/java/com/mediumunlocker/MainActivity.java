@@ -8,7 +8,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -60,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton supportButton;
     private MaterialButton githubButton;
     private MaterialButton updateButton;
+    private View deepLinkBanner;
+    private MaterialButton deepLinkSettingsButton;
 
     private ExecutorService executor;
 
@@ -82,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
         checkForUpdates();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkAndShowDeepLinkBanner();
+    }
+
     private void initializeViews() {
         urlInput = findViewById(R.id.urlInput);
         unlockButton = findViewById(R.id.unlockButton);
@@ -89,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         supportButton = findViewById(R.id.supportButton);
         githubButton = findViewById(R.id.githubButton);
         updateButton = findViewById(R.id.updateButton);
+        deepLinkBanner = findViewById(R.id.deepLinkBanner);
+        deepLinkSettingsButton = findViewById(R.id.deepLinkSettingsButton);
     }
 
     private void setupListeners() {
@@ -113,8 +125,38 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+        deepLinkSettingsButton.setOnClickListener(v -> openDefaultLinksSettings());
+
         // Auto-paste from clipboard if it contains a Medium URL
         tryAutoPasteFromClipboard();
+    }
+
+    private void checkAndShowDeepLinkBanner() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            // Below Android 12, the chooser dialog works fine — no banner needed
+            return;
+        }
+        // Check if this app is already the default handler for medium.com links
+        Intent testIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://medium.com/test"));
+        PackageManager pm = getPackageManager();
+        android.content.pm.ResolveInfo resolveInfo = pm.resolveActivity(
+                testIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        boolean isDefault = resolveInfo != null
+                && getPackageName().equals(resolveInfo.activityInfo.packageName);
+        deepLinkBanner.setVisibility(isDefault ? View.GONE : View.VISIBLE);
+    }
+
+    private void openDefaultLinksSettings() {
+        try {
+            Intent intent = new Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                    Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        } catch (Exception e) {
+            // Fallback to general app settings if the deep link settings page isn't available
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        }
     }
 
     private void openUrl(String url) {

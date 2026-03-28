@@ -27,18 +27,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Handle Medium URLs shared from other apps -->
-            <intent-filter android:autoVerify="true">
+            <!-- Deep link: intercept Medium URLs (shows chooser dialog) -->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="medium.com" />
-                <data android:host="*.medium.com" />
+                <data android:scheme="https" android:host="medium.com" />
+                <data android:scheme="https" android:host="*.medium.com" />
+                <data android:scheme="http" android:host="medium.com" />
+                <data android:scheme="http" android:host="*.medium.com" />
             </intent-filter>
 
             <!-- Handle text shares that might contain Medium URLs -->

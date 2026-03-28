@@ -12,4 +12,7 @@
     <string name="retry">Retry</string>
     <string name="share_app">Share App</string>
     <string name="open_browser">Open in Browser</string>
+    <string name="deep_link_banner_title">Open Medium links automatically</string>
+    <string name="deep_link_banner_body">Tap below to open Android settings. Then choose In the app (not In your browser), tap Add link, and add medium.com and *.medium.com so Medium links open here.</string>
+    <string name="deep_link_banner_button">Open link settings</string>
 </resources>

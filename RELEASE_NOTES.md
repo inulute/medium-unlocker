@@ -1,3 +1,19 @@
+# Release v1.4
+
+## 🔗 New Features
+
+### Open Medium Links Automatically
+- Added deep link support — Medium article links clicked in email, WhatsApp, or any other app can now open directly in Medium Unlocker instead of the browser.
+- On Android 12+, a banner appears on the home screen with a one-tap **"Enable in Settings"** button that takes you straight to the app's link-handling settings.
+- Once enabled, the banner disappears automatically.
+- On Android 11 and below, a system chooser dialog appears when opening Medium links — select Medium Unlocker and tap "Always" to set it as the default.
+
+## 📋 Misc
+
+- Fixed intent filter to correctly handle `medium.com` and `*.medium.com` links without the failed auto-verification that was silently blocking deep links on Android 12+.
+
+---
+
 # Release v1.3
 
 ## 🚀 New Features
