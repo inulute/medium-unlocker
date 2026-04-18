@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton supportButton;
     private MaterialButton githubButton;
     private MaterialButton updateButton;
+    private MaterialButton historyButton;
     private View deepLinkBanner;
     private MaterialButton deepLinkSettingsButton;
 
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         supportButton = findViewById(R.id.supportButton);
         githubButton = findViewById(R.id.githubButton);
         updateButton = findViewById(R.id.updateButton);
+        historyButton = findViewById(R.id.historyButton);
         deepLinkBanner = findViewById(R.id.deepLinkBanner);
         deepLinkSettingsButton = findViewById(R.id.deepLinkSettingsButton);
     }
@@ -110,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Top bar buttons
         updateButton.setOnClickListener(v -> showUpdateDialog());
+
+        historyButton.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
 
         supportButton.setOnClickListener(v -> openUrl("https://support.inulute.com"));
 

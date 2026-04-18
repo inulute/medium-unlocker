@@ -46,6 +46,20 @@
                     app:iconSize="20dp"
                     app:iconTint="@color/primary" />
 
+                <!-- History Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/historyButton"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="History &amp; Bookmarks"
+                    app:icon="@drawable/ic_history"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/primary" />
+
                 <!-- Support Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/supportButton"

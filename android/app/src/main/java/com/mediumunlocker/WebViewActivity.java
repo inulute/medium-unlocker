@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.SslErrorHandler;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -22,6 +24,7 @@ import android.webkit.WebViewClient;
 import android.net.http.SslError;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -30,6 +33,9 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 public class WebViewActivity extends AppCompatActivity {
+
+    private HistoryManager historyManager;
+    private MenuItem bookmarkMenuItem;
 
     private static final String TAG = "WebViewActivity";
     private static final String PREFS_NAME = "MediumUnlockerPrefs";
@@ -56,6 +62,7 @@ public class WebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview);
 
+        historyManager = HistoryManager.getInstance(this);
         initializeViews();
         setupToolbar();
         setupWebView();
@@ -135,9 +142,13 @@ public class WebViewActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
 
         toolbar.inflateMenu(R.menu.webview_menu);
+        bookmarkMenuItem = toolbar.getMenu().findItem(R.id.action_bookmark);
         toolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.action_open_browser) {
+            if (id == R.id.action_bookmark) {
+                toggleBookmark();
+                return true;
+            } else if (id == R.id.action_open_browser) {
                 openInBrowser();
                 return true;
             } else if (id == R.id.action_share) {
@@ -149,6 +160,29 @@ public class WebViewActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    private void toggleBookmark() {
+        if (originalUrl == null || originalUrl.isEmpty()) return;
+        String title = webView.getTitle() != null ? webView.getTitle() : "";
+        String freediumUrl = webView.getUrl() != null ? webView.getUrl() : currentUrl;
+        if (historyManager.isBookmarked(originalUrl)) {
+            historyManager.removeBookmark(originalUrl);
+            updateBookmarkIcon(false);
+            Toast.makeText(this, "Bookmark removed", Toast.LENGTH_SHORT).show();
+        } else {
+            historyManager.addBookmark(title, originalUrl, freediumUrl != null ? freediumUrl : "");
+            updateBookmarkIcon(true);
+            Toast.makeText(this, "Bookmarked!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateBookmarkIcon(boolean bookmarked) {
+        if (bookmarkMenuItem != null) {
+            bookmarkMenuItem.setIcon(bookmarked
+                    ? R.drawable.ic_bookmark_filled
+                    : R.drawable.ic_bookmark);
+        }
     }
 
     private void setupWebView() {
@@ -202,6 +236,12 @@ public class WebViewActivity extends AppCompatActivity {
                 String title = view.getTitle();
                 if (title != null && !title.isEmpty() && !title.startsWith("http")) {
                     toolbar.setTitle(title);
+                }
+                // Save to history and update bookmark icon
+                if (originalUrl != null && !originalUrl.isEmpty()) {
+                    String pageTitle = (title != null && !title.isEmpty() && !title.startsWith("http")) ? title : "";
+                    historyManager.saveToHistory(pageTitle, originalUrl, url != null ? url : "");
+                    updateBookmarkIcon(historyManager.isBookmarked(originalUrl));
                 }
             }
 
