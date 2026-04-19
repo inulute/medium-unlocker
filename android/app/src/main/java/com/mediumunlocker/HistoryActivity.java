@@ -1,30 +1,43 @@
 package com.inulute.mediumunlocker;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +45,9 @@ import java.util.Locale;
 public class HistoryActivity extends AppCompatActivity {
 
     private HistoryManager historyManager;
-    private ListView listView;
+    private RecyclerView recyclerView;
     private TextView emptyView;
+    private HistoryAdapter adapter;
     private boolean showingHistory = true;
 
     private final ActivityResultLauncher<String[]> importLauncher = registerForActivityResult(
@@ -54,27 +68,35 @@ public class HistoryActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(this::onMenuItemSelected);
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
-        listView = findViewById(R.id.historyListView);
+        recyclerView = findViewById(R.id.historyListView);
         emptyView = findViewById(R.id.emptyView);
+
+        TextInputEditText searchInput = findViewById(R.id.searchInput);
+        if (searchInput != null) {
+            searchInput.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (adapter != null) adapter.filter(s.toString());
+                }
+                @Override public void afterTextChanged(Editable s) {}
+            });
+        }
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new HistoryAdapter();
+        recyclerView.setAdapter(adapter);
+
+        new ItemTouchHelper(new SwipeToDeleteCallback()).attachToRecyclerView(recyclerView);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override public void onTabSelected(TabLayout.Tab tab) {
                 showingHistory = tab.getPosition() == 0;
+                if (searchInput != null) searchInput.setText("");
                 refreshList();
             }
             @Override public void onTabUnselected(TabLayout.Tab tab) {}
             @Override public void onTabReselected(TabLayout.Tab tab) {}
-        });
-
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            List<HistoryManager.HistoryItem> items = getCurrentList();
-            if (position < items.size()) openItem(items.get(position));
-        });
-
-        listView.setOnItemLongClickListener((parent, view, position, id) -> {
-            List<HistoryManager.HistoryItem> items = getCurrentList();
-            if (position < items.size()) showItemOptions(items.get(position));
-            return true;
         });
 
         refreshList();
@@ -93,19 +115,21 @@ public class HistoryActivity extends AppCompatActivity {
     private void refreshList() {
         List<HistoryManager.HistoryItem> items = getCurrentList();
         if (items.isEmpty()) {
-            listView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
-            emptyView.setText(showingHistory ? "No history yet.\nUnlock an article to get started." : "No bookmarks yet.\nBookmark articles while reading.");
+            emptyView.setText(showingHistory
+                    ? "No history yet.\nUnlock an article to get started."
+                    : "No bookmarks yet.\nBookmark articles while reading.");
         } else {
-            listView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
-            listView.setAdapter(new HistoryAdapter(items));
+            adapter.setItems(items);
         }
     }
 
     private void openItem(HistoryManager.HistoryItem item) {
         Intent intent = new Intent(this, WebViewActivity.class);
-        intent.putExtra("url", item.freediumUrl.isEmpty() ? item.originalUrl : item.freediumUrl);
+        intent.putExtra("url", "https://freedium-mirror.cfd/" + item.originalUrl);
         intent.putExtra("originalUrl", item.originalUrl);
         startActivity(intent);
     }
@@ -156,31 +180,22 @@ public class HistoryActivity extends AppCompatActivity {
 
     private boolean onMenuItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_export) {
-            exportData();
-            return true;
-        } else if (id == R.id.action_import) {
+        if (id == R.id.action_export) { exportData(); return true; }
+        else if (id == R.id.action_import) {
             importLauncher.launch(new String[]{"application/json", "text/plain", "*/*"});
             return true;
-        } else if (id == R.id.action_clear) {
-            showClearDialog();
-            return true;
-        }
+        } else if (id == R.id.action_clear) { showClearDialog(); return true; }
         return false;
     }
 
     private void exportData() {
         String json = historyManager.exportToJson();
-        if (json == null) {
-            Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (json == null) { Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show(); return; }
         try {
             File file = new File(getCacheDir(), "medium_unlocker_history.json");
             FileWriter writer = new FileWriter(file);
             writer.write(json);
             writer.close();
-
             Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("application/json");
@@ -200,7 +215,6 @@ public class HistoryActivity extends AppCompatActivity {
             String line;
             while ((line = reader.readLine()) != null) sb.append(line).append("\n");
             reader.close();
-
             if (historyManager.importFromJson(sb.toString())) {
                 Toast.makeText(this, "Import successful!", Toast.LENGTH_SHORT).show();
                 refreshList();
@@ -219,6 +233,7 @@ public class HistoryActivity extends AppCompatActivity {
                     switch (which) {
                         case 0:
                             historyManager.clearHistory();
+                            historyManager.clearPositions();
                             Toast.makeText(this, "History cleared", Toast.LENGTH_SHORT).show();
                             break;
                         case 1:
@@ -228,6 +243,7 @@ public class HistoryActivity extends AppCompatActivity {
                         case 2:
                             historyManager.clearHistory();
                             historyManager.clearBookmarks();
+                            historyManager.clearPositions();
                             Toast.makeText(this, "All data cleared", Toast.LENGTH_SHORT).show();
                             break;
                     }
@@ -237,46 +253,93 @@ public class HistoryActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ==================== Adapter ====================
+    // ==================== RecyclerView Adapter ====================
 
-    private class HistoryAdapter extends BaseAdapter {
-        private final List<HistoryManager.HistoryItem> items;
+    class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
+        private List<HistoryManager.HistoryItem> fullList = new ArrayList<>();
+        List<HistoryManager.HistoryItem> displayList = new ArrayList<>();
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
+        private String currentFilter = "";
 
-        HistoryAdapter(List<HistoryManager.HistoryItem> items) {
-            this.items = items;
+        void setItems(List<HistoryManager.HistoryItem> items) {
+            fullList = new ArrayList<>(items);
+            applyFilter(currentFilter);
         }
 
-        @Override public int getCount() { return items.size(); }
-        @Override public Object getItem(int pos) { return items.get(pos); }
-        @Override public long getItemId(int pos) { return pos; }
+        void filter(String query) {
+            currentFilter = query;
+            applyFilter(query);
+        }
+
+        private void applyFilter(String query) {
+            if (query == null || query.trim().isEmpty()) {
+                displayList = new ArrayList<>(fullList);
+            } else {
+                String lower = query.toLowerCase(Locale.getDefault());
+                displayList = new ArrayList<>();
+                for (HistoryManager.HistoryItem item : fullList) {
+                    if (item.title.toLowerCase(Locale.getDefault()).contains(lower)
+                            || item.originalUrl.toLowerCase(Locale.getDefault()).contains(lower)) {
+                        displayList.add(item);
+                    }
+                }
+            }
+            notifyDataSetChanged();
+            emptyView.setVisibility(displayList.isEmpty() ? View.VISIBLE : View.GONE);
+            recyclerView.setVisibility(displayList.isEmpty() ? View.GONE : View.VISIBLE);
+            if (displayList.isEmpty() && !currentFilter.isEmpty()) {
+                emptyView.setText("No results for \"" + currentFilter + "\"");
+            }
+        }
+
+        void removeItem(int position) {
+            if (position < 0 || position >= displayList.size()) return;
+            HistoryManager.HistoryItem removed = displayList.remove(position);
+            // Also remove from fullList
+            for (int i = 0; i < fullList.size(); i++) {
+                if (fullList.get(i).originalUrl.equals(removed.originalUrl)) {
+                    fullList.remove(i);
+                    break;
+                }
+            }
+            notifyItemRemoved(position);
+            if (displayList.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+                emptyView.setText(showingHistory ? "No history yet." : "No bookmarks yet.");
+            }
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_history, parent, false);
+            return new ViewHolder(v);
+        }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.item_history, parent, false);
-            }
-            HistoryManager.HistoryItem item = items.get(position);
-
-            TextView titleView = convertView.findViewById(R.id.itemTitle);
-            TextView metaView = convertView.findViewById(R.id.itemMeta);
-            View bookmarkIndicator = convertView.findViewById(R.id.bookmarkIndicator);
-
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            HistoryManager.HistoryItem item = displayList.get(position);
             String title = item.title.isEmpty() ? "Article" : item.title;
-            titleView.setText(title);
+            holder.titleView.setText(title);
 
             String date = item.timestamp > 0 ? dateFormat.format(new Date(item.timestamp)) : "";
             String domain = extractDomain(item.originalUrl);
-            metaView.setText(domain.isEmpty() ? date : (date.isEmpty() ? domain : domain + " · " + date));
+            holder.metaView.setText(domain.isEmpty() ? date : (date.isEmpty() ? domain : domain + " · " + date));
 
-            if (bookmarkIndicator != null) {
-                bookmarkIndicator.setVisibility(
+            if (holder.bookmarkIndicator != null) {
+                holder.bookmarkIndicator.setVisibility(
                         showingHistory && historyManager.isBookmarked(item.originalUrl)
                                 ? View.VISIBLE : View.GONE);
             }
 
-            return convertView;
+            holder.itemView.setOnClickListener(v -> openItem(item));
+            holder.itemView.setOnLongClickListener(v -> { showItemOptions(item); return true; });
         }
+
+        @Override
+        public int getItemCount() { return displayList.size(); }
 
         private String extractDomain(String url) {
             try {
@@ -284,9 +347,85 @@ public class HistoryActivity extends AppCompatActivity {
                 String host = uri.getHost();
                 if (host == null) return "";
                 return host.startsWith("www.") ? host.substring(4) : host;
-            } catch (Exception e) {
-                return "";
+            } catch (Exception e) { return ""; }
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView titleView;
+            TextView metaView;
+            View bookmarkIndicator;
+
+            ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                titleView = itemView.findViewById(R.id.itemTitle);
+                metaView = itemView.findViewById(R.id.itemMeta);
+                bookmarkIndicator = itemView.findViewById(R.id.bookmarkIndicator);
             }
+        }
+    }
+
+    // ==================== Swipe to Delete ====================
+
+    private class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
+        private final Paint paint = new Paint();
+        private final int deleteColor = Color.parseColor("#EF4444");
+
+        SwipeToDeleteCallback() {
+            super(0, ItemTouchHelper.LEFT);
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView rv,
+                              @NonNull RecyclerView.ViewHolder vh,
+                              @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getAdapterPosition();
+            if (position < 0 || position >= adapter.displayList.size()) return;
+            HistoryManager.HistoryItem item = adapter.displayList.get(position);
+            if (showingHistory) {
+                historyManager.removeFromHistory(item.originalUrl);
+            } else {
+                historyManager.removeBookmark(item.originalUrl);
+            }
+            adapter.removeItem(position);
+        }
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c,
+                                @NonNull RecyclerView recyclerView,
+                                @NonNull RecyclerView.ViewHolder viewHolder,
+                                float dX, float dY,
+                                int actionState, boolean isCurrentlyActive) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                View itemView = viewHolder.itemView;
+                float swipeWidth = Math.abs(dX);
+                int margin = (int) (16 * recyclerView.getResources().getDisplayMetrics().density);
+                float cornerRadius = 20 * recyclerView.getResources().getDisplayMetrics().density;
+
+                if (dX < 0) {
+                    paint.setColor(deleteColor);
+                    RectF background = new RectF(
+                            itemView.getLeft() + margin + dX,
+                            itemView.getTop(),
+                            itemView.getRight() - margin,
+                            itemView.getBottom()
+                    );
+                    c.drawRoundRect(background, cornerRadius, cornerRadius, paint);
+
+                    if (swipeWidth > 120) {
+                        paint.setColor(Color.WHITE);
+                        paint.setTextSize(36f);
+                        paint.setTextAlign(Paint.Align.RIGHT);
+                        float textY = itemView.getTop() + (itemView.getHeight() / 2f) + 12f;
+                        c.drawText("Delete", itemView.getRight() - margin - 24f, textY, paint);
+                    }
+                }
+            }
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
     }
 }

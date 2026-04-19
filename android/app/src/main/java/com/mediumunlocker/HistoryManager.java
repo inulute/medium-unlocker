@@ -14,10 +14,13 @@ public class HistoryManager {
     private static final String PREFS_NAME = "MediumUnlockerHistory";
     private static final String KEY_HISTORY = "history";
     private static final String KEY_BOOKMARKS = "bookmarks";
-    private static final int MAX_HISTORY = 100;
+    private static final String POSITIONS_PREFS = "ReadingPositions";
+    private static final String APP_PREFS = "MediumUnlockerPrefs";
 
     private static HistoryManager instance;
     private final SharedPreferences prefs;
+    private final SharedPreferences positionPrefs;
+    private final SharedPreferences appPrefs;
 
     public static class HistoryItem {
         public String title;
@@ -52,7 +55,10 @@ public class HistoryManager {
     }
 
     private HistoryManager(Context context) {
-        prefs = context.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Context app = context.getApplicationContext();
+        prefs = app.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        positionPrefs = app.getSharedPreferences(POSITIONS_PREFS, Context.MODE_PRIVATE);
+        appPrefs = app.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE);
     }
 
     public static HistoryManager getInstance(Context context) {
@@ -63,14 +69,31 @@ public class HistoryManager {
     }
 
     public void saveToHistory(String title, String originalUrl, String freediumUrl) {
+        int maxHistory = appPrefs.getInt(SettingsActivity.PREF_MAX_HISTORY, 100);
         List<HistoryItem> history = getHistory();
         List<HistoryItem> filtered = new ArrayList<>();
         for (HistoryItem item : history) {
             if (!item.originalUrl.equals(originalUrl)) filtered.add(item);
         }
         filtered.add(0, new HistoryItem(title, originalUrl, freediumUrl, System.currentTimeMillis()));
-        if (filtered.size() > MAX_HISTORY) filtered = filtered.subList(0, MAX_HISTORY);
+        if (filtered.size() > maxHistory) filtered = filtered.subList(0, maxHistory);
         saveList(KEY_HISTORY, filtered);
+    }
+
+    // ==================== Reading Positions ====================
+
+    public void savePosition(String originalUrl, int scrollY) {
+        if (originalUrl == null || originalUrl.isEmpty()) return;
+        positionPrefs.edit().putInt(originalUrl, scrollY).apply();
+    }
+
+    public int getPosition(String originalUrl) {
+        if (originalUrl == null || originalUrl.isEmpty()) return 0;
+        return positionPrefs.getInt(originalUrl, 0);
+    }
+
+    public void clearPositions() {
+        positionPrefs.edit().clear().apply();
     }
 
     public void removeFromHistory(String originalUrl) {

@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import android.app.Dialog;
@@ -23,6 +25,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.Window;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -53,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREF_POPUP_SHOWN_VERSION = "popup_shown_version";
     private static final String PREF_CACHED_VERSION = "cached_latest_version";
     private static final String PREF_LAST_CHECK = "last_update_check";
-    private static final String PREF_USE_MIRROR = "use_mirror";
     private static final long UPDATE_CHECK_INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
 
     private TextInputEditText urlInput;
@@ -63,8 +70,12 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton githubButton;
     private MaterialButton updateButton;
     private MaterialButton historyButton;
+    private MaterialButton settingsButton;
     private View deepLinkBanner;
     private MaterialButton deepLinkSettingsButton;
+    private LinearLayout recentSection;
+    private LinearLayout recentContainer;
+    private TextView recentSectionLabel;
 
     private ExecutorService executor;
 
@@ -91,6 +102,106 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         checkAndShowDeepLinkBanner();
+        refreshRecentArticles();
+    }
+
+    private void refreshRecentArticles() {
+        if (recentSection == null || recentContainer == null) return;
+        HistoryManager hm = HistoryManager.getInstance(this);
+        String feed = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .getString(SettingsActivity.PREF_HOME_FEED, "history");
+
+        List<HistoryManager.HistoryItem> items;
+        if ("bookmarks".equals(feed)) {
+            items = hm.getBookmarks();
+            if (recentSectionLabel != null) recentSectionLabel.setText("BOOKMARKS");
+        } else if ("both".equals(feed)) {
+            items = new ArrayList<>(hm.getHistory());
+            for (HistoryManager.HistoryItem bm : hm.getBookmarks()) {
+                boolean found = false;
+                for (HistoryManager.HistoryItem hi : items) {
+                    if (hi.originalUrl.equals(bm.originalUrl)) { found = true; break; }
+                }
+                if (!found) items.add(bm);
+            }
+            items.sort((a, b) -> Long.compare(b.timestamp, a.timestamp));
+            if (recentSectionLabel != null) recentSectionLabel.setText("RECENT");
+        } else {
+            items = hm.getHistory();
+            if (recentSectionLabel != null) recentSectionLabel.setText("RECENT");
+        }
+
+        List<HistoryManager.HistoryItem> recent = items.subList(0, Math.min(5, items.size()));
+
+        if (recent.isEmpty()) {
+            recentSection.setVisibility(View.GONE);
+            return;
+        }
+
+        recentSection.setVisibility(View.VISIBLE);
+        recentContainer.removeAllViews();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM d", Locale.getDefault());
+        for (HistoryManager.HistoryItem item : recent) {
+            View card = LayoutInflater.from(this).inflate(R.layout.item_recent, recentContainer, false);
+
+            TextView titleView = card.findViewById(R.id.recentItemTitle);
+            TextView metaView = card.findViewById(R.id.recentItemMeta);
+            ImageButton bookmarkBtn = card.findViewById(R.id.recentItemBookmark);
+
+            titleView.setText(item.title.isEmpty() ? extractDomain(item.originalUrl) : item.title);
+            String date = item.timestamp > 0 ? sdf.format(new Date(item.timestamp)) : "";
+            String domain = extractDomain(item.originalUrl);
+            metaView.setText(domain.isEmpty() ? date : (date.isEmpty() ? domain : domain + " · " + date));
+
+            View tagView = card.findViewById(R.id.recentItemTag);
+            if (tagView != null) {
+                tagView.setVisibility("both".equals(feed) && hm.isBookmarked(item.originalUrl)
+                        ? View.VISIBLE : View.GONE);
+            }
+
+            updateBookmarkBtn(bookmarkBtn, hm.isBookmarked(item.originalUrl));
+            bookmarkBtn.setOnClickListener(v -> {
+                boolean nowBookmarked;
+                if (hm.isBookmarked(item.originalUrl)) {
+                    hm.removeBookmark(item.originalUrl);
+                    nowBookmarked = false;
+                } else {
+                    hm.addBookmark(item.title, item.originalUrl, item.freediumUrl);
+                    nowBookmarked = true;
+                }
+                updateBookmarkBtn(bookmarkBtn, nowBookmarked);
+                if (tagView != null && "both".equals(feed)) {
+                    tagView.setVisibility(nowBookmarked ? View.VISIBLE : View.GONE);
+                }
+            });
+
+            final HistoryManager.HistoryItem finalItem = item;
+            card.setOnClickListener(v -> {
+                Intent intent = new Intent(this, WebViewActivity.class);
+                intent.putExtra("url", "https://freedium-mirror.cfd/" + finalItem.originalUrl);
+                intent.putExtra("originalUrl", finalItem.originalUrl);
+                startActivity(intent);
+            });
+
+            recentContainer.addView(card);
+        }
+    }
+
+    private void updateBookmarkBtn(ImageButton btn, boolean bookmarked) {
+        btn.setImageResource(bookmarked ? R.drawable.ic_bookmark_filled : R.drawable.ic_bookmark);
+        btn.setColorFilter(bookmarked
+                ? getResources().getColor(R.color.primary, getTheme())
+                : getResources().getColor(R.color.text_secondary, getTheme()));
+    }
+
+    private String extractDomain(String url) {
+        try {
+            Uri uri = Uri.parse(url);
+            String host = uri.getHost();
+            if (host == null) return "";
+            return host.startsWith("www.") ? host.substring(4) : host;
+        } catch (Exception e) { return ""; }
     }
 
     private void initializeViews() {
@@ -101,8 +212,12 @@ public class MainActivity extends AppCompatActivity {
         githubButton = findViewById(R.id.githubButton);
         updateButton = findViewById(R.id.updateButton);
         historyButton = findViewById(R.id.historyButton);
+        settingsButton = findViewById(R.id.settingsButton);
         deepLinkBanner = findViewById(R.id.deepLinkBanner);
         deepLinkSettingsButton = findViewById(R.id.deepLinkSettingsButton);
+        recentSection = findViewById(R.id.recentSection);
+        recentContainer = findViewById(R.id.recentContainer);
+        recentSectionLabel = findViewById(R.id.recentSectionLabel);
     }
 
     private void setupListeners() {
@@ -114,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
         updateButton.setOnClickListener(v -> showUpdateDialog());
 
         historyButton.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
+
+        settingsButton.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
 
         supportButton.setOnClickListener(v -> openUrl("https://support.inulute.com"));
 
@@ -130,6 +247,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         deepLinkSettingsButton.setOnClickListener(v -> openDefaultLinksSettings());
+
+        TextView seeAllButton = findViewById(R.id.seeAllButton);
+        if (seeAllButton != null) {
+            seeAllButton.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
+        }
 
         // Auto-paste from clipboard if it contains a Medium URL
         tryAutoPasteFromClipboard();
@@ -282,10 +404,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String convertToFreedium(String mediumUrl) {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean useMirror = prefs.getBoolean(PREF_USE_MIRROR, true); // Default to true
-        String domain = useMirror ? "freedium-mirror.cfd" : "freedium.cfd";
-        return "https://" + domain + "/" + mediumUrl;
+        return "https://freedium-mirror.cfd/" + mediumUrl;
     }
 
     private String extractUrl(String text) {

@@ -1,51 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/background"
-    android:orientation="horizontal"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp"
-    android:gravity="center_vertical">
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp"
+    app:cardBackgroundColor="@color/card"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/border"
+    app:strokeWidth="1dp"
+    app:rippleColor="@color/border">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/itemTitle"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:layout_marginBottom="4dp" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/itemMeta"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:textColor="@color/text_muted"
-            android:textSize="12sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            <TextView
+                android:id="@+id/itemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/itemMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Bookmark indicator dot -->
+        <View
+            android:id="@+id/bookmarkIndicator"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/bg_accent_circle"
+            android:visibility="gone" />
 
     </LinearLayout>
 
-    <!-- Bookmark indicator dot (shown in History tab when article is bookmarked) -->
-    <View
-        android:id="@+id/bookmarkIndicator"
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/bg_accent_circle"
-        android:visibility="gone" />
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

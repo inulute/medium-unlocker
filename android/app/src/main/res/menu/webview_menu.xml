@@ -9,6 +9,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_forward"
+        android:icon="@drawable/ic_forward"
+        android:title="Forward"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_refresh"
         android:icon="@android:drawable/ic_menu_rotate"
         android:title="Refresh"

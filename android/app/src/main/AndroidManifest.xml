@@ -61,6 +61,12 @@
             android:exported="false"
             android:theme="@style/AppTheme" />
 
+        <!-- Settings Activity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+
         <!-- FileProvider for sharing exported history JSON -->
         <provider
             android:name="androidx.core.content.FileProvider"

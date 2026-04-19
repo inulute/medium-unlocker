@@ -45,19 +45,56 @@
         android:layout_height="1dp"
         android:background="@color/border" />
 
+    <!-- Search bar -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        app:boxBackgroundColor="@color/secondary"
+        app:boxCornerRadiusBottomEnd="14dp"
+        app:boxCornerRadiusBottomStart="14dp"
+        app:boxCornerRadiusTopEnd="14dp"
+        app:boxCornerRadiusTopStart="14dp"
+        app:boxStrokeColor="@color/border_light"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:hintTextColor="@color/text_secondary"
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        app:startIconTint="@color/text_secondary">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search articles..."
+            android:fontFamily="sans-serif"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/historyListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@color/border"
-            android:dividerHeight="1dp"
-            android:scrollbarThumbVertical="@color/border"
             android:background="@color/background"
-            android:listSelector="@color/secondary" />
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="24dp" />
 
         <TextView
             android:id="@+id/emptyView"
