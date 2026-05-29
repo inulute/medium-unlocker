@@ -1,3 +1,35 @@
+# v2.1 (2026-05-29)
+
+---
+
+<div align='center'>
+
+<img src=./assets/medium_unlock_logo.svg width='150px'>
+
+</div>
+
+---
+
+## Fixes
+
+### Mirror Server Overhaul (closes #4)
+- **freedium.cfd and freedium-mirror.cfd are offline** – both servers are no longer reachable. This release switches the default to **archive.is**, which provides archived snapshots of Medium articles.
+- **Auto-fallback cycle** – if the selected mirror fails, the app automatically tries the next one in order (Archive.is → Archive.is Alt → Freedium → Freedium Mirror) before showing an error.
+- **"Try Different Mirror" button** – manually cycles through all four mirrors from the error screen.
+
+## New Features
+
+### Mirror Selector
+- **Settings** – a new **Mirror Server** picker lets you choose your preferred mirror: Archive.is, Archive.is (Alt), Freedium, or Freedium Mirror.
+- **Website** – the mirror toggle on the web app is now a dropdown matching the same four options, with your choice saved across sessions.
+
+## UI
+- **About dialog** – removed the prominent Close button (tap outside to dismiss); replaced "Powered by freedium.cfd" with "Made by inulute" using the heart icon; removed the left accent bar.
+- **Update dialog** – removed the Skip button; dialog now has just Later and Update.
+- **Settings** – added a Credits section listing archive.is and freedium.cfd with a "Made with ♥ by inulute" footer.
+
+---
+
 # v2.0 (2026-04-19)
 
 ---
