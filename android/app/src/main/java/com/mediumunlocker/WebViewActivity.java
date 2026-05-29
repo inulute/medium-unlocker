@@ -39,6 +39,13 @@ public class WebViewActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "MediumUnlockerPrefs";
     private static final String PREF_WEBVIEW_POPUP_SHOWN_VERSION = "webview_popup_shown_version";
 
+    private static final String[] MIRROR_BASES = {
+        "https://archive.is/newest/",
+        "https://archive.is/oldest/",
+        "https://freedium.cfd/",
+        "https://freedium-mirror.cfd/"
+    };
+
     private HistoryManager historyManager;
     private MenuItem bookmarkMenuItem;
     private MenuItem forwardMenuItem;
@@ -59,6 +66,8 @@ public class WebViewActivity extends AppCompatActivity {
     private String currentUrl;
     private String originalUrl;
     private boolean positionRestored = false;
+    private int currentMirrorIndex = 0;
+    private int startMirrorIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +135,6 @@ public class WebViewActivity extends AppCompatActivity {
         }
         dialog.setCancelable(true);
         ((TextView) dialog.findViewById(R.id.updateVersionText)).setText("v" + version + " is now available");
-        dialog.findViewById(R.id.updateSkipButton).setOnClickListener(v -> dialog.dismiss());
         dialog.findViewById(R.id.updateCancelButton).setOnClickListener(v -> dialog.dismiss());
         dialog.findViewById(R.id.updateNowButton).setOnClickListener(v -> {
             try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); } catch (Exception ignored) { }
@@ -268,15 +276,18 @@ public class WebViewActivity extends AppCompatActivity {
                 if (request.isForMainFrame()) {
                     hideLoading();
                     view.setVisibility(View.GONE);
-                    String url = request.getUrl().toString();
-                    if (url.contains("freedium-mirror.cfd")) {
-                        Log.d(TAG, "Mirror domain failed, switching to primary...");
+                    int nextIndex = (currentMirrorIndex + 1) % MIRROR_BASES.length;
+                    if (nextIndex != startMirrorIndex && originalUrl != null) {
+                        currentMirrorIndex = nextIndex;
+                        String nextUrl = MIRROR_BASES[currentMirrorIndex] + originalUrl;
+                        currentUrl = nextUrl;
+                        Log.d(TAG, "Mirror failed, trying next: " + MIRROR_BASES[currentMirrorIndex]);
                         if (loadingOverlay != null) {
                             loadingOverlay.setVisibility(View.VISIBLE);
-                            if (loadingText != null) loadingText.setText("Switching to primary server...");
+                            if (loadingText != null) loadingText.setText("Trying next mirror...");
                         }
                         view.setVisibility(View.VISIBLE);
-                        view.loadUrl(url.replace("freedium-mirror.cfd", "freedium.cfd"));
+                        view.loadUrl(nextUrl);
                         return;
                     }
                     showError();
@@ -286,14 +297,18 @@ public class WebViewActivity extends AppCompatActivity {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 String url = error.getUrl();
-                if (url != null && (url.contains("freedium-mirror.cfd") || url.contains("freedium.cfd"))) handler.proceed();
+                if (url != null && (url.contains("freedium-mirror.cfd") || url.contains("freedium.cfd")
+                        || url.contains("archive.is") || url.contains("archive.ph") || url.contains("archive.today")))
+                    handler.proceed();
                 else handler.cancel();
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
-                if (url.contains("freedium.cfd") || url.contains("freedium-mirror.cfd") || url.contains("medium.com")) {
+                if (url.contains("freedium.cfd") || url.contains("freedium-mirror.cfd")
+                        || url.contains("archive.is") || url.contains("archive.ph") || url.contains("archive.today")
+                        || url.contains("medium.com")) {
                     return false;
                 }
                 try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
@@ -332,25 +347,19 @@ public class WebViewActivity extends AppCompatActivity {
 
         tryProxyButton.setVisibility(View.GONE);
 
-        tryAlternativeButton.setText("Try Mirror Server");
+        tryAlternativeButton.setText("Try Different Mirror");
         tryAlternativeButton.setVisibility(View.VISIBLE);
         tryAlternativeButton.setOnClickListener(v -> {
-            if (webView.getUrl() != null) {
-                String current = webView.getUrl();
-                String newUrl;
-                if (current.contains("freedium-mirror.cfd")) {
-                    newUrl = current.replace("freedium-mirror.cfd", "freedium.cfd");
-                    if (loadingText != null) loadingText.setText("Switching to primary server...");
-                } else {
-                    newUrl = current.replace("freedium.cfd", "freedium-mirror.cfd");
-                    if (loadingText != null) loadingText.setText("Switching to mirror server...");
-                }
+            if (originalUrl != null) {
+                currentMirrorIndex = (currentMirrorIndex + 1) % MIRROR_BASES.length;
+                startMirrorIndex = currentMirrorIndex;
+                String nextUrl = MIRROR_BASES[currentMirrorIndex] + originalUrl;
+                currentUrl = nextUrl;
+                if (loadingText != null) loadingText.setText("Switching to " + getMirrorLabel(currentMirrorIndex) + "...");
                 if (loadingOverlay != null) loadingOverlay.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.GONE);
                 webView.setVisibility(View.VISIBLE);
-                webView.loadUrl(newUrl);
-            } else if (currentUrl != null) {
-                webView.loadUrl(currentUrl.replace("freedium.cfd", "freedium-mirror.cfd"));
+                webView.loadUrl(nextUrl);
             }
         });
 
@@ -361,8 +370,30 @@ public class WebViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentUrl = intent.getStringExtra("url");
         originalUrl = intent.getStringExtra("originalUrl");
+
+        // Determine which mirror index matches the URL we're opening
+        currentMirrorIndex = 0;
+        if (currentUrl != null) {
+            for (int i = 0; i < MIRROR_BASES.length; i++) {
+                if (currentUrl.startsWith(MIRROR_BASES[i])) {
+                    currentMirrorIndex = i;
+                    break;
+                }
+            }
+        }
+        startMirrorIndex = currentMirrorIndex;
+
         if (currentUrl != null && !currentUrl.isEmpty()) webView.loadUrl(currentUrl);
         else showError();
+    }
+
+    private String getMirrorLabel(int index) {
+        switch (index) {
+            case 1: return "Archive.is (Alt)";
+            case 2: return "Freedium";
+            case 3: return "Freedium Mirror";
+            default: return "Archive.is";
+        }
     }
 
     private void showLoading() {

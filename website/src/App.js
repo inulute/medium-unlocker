@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+const MIRRORS = [
+  { label: 'Archive.is',       value: 'archive',        base: 'https://archive.is/newest/' },
+  { label: 'Archive.is (Alt)', value: 'archive_alt',    base: 'https://archive.is/oldest/' },
+  { label: 'Freedium',         value: 'freedium',       base: 'https://freedium.cfd/' },
+  { label: 'Freedium Mirror',  value: 'freedium_mirror',base: 'https://freedium-mirror.cfd/' },
+];
+
 function App() {
   const [url, setUrl] = useState('');
-  const [useMirror, setUseMirror] = useState(() => {
-    return localStorage.getItem('useMirror') === 'true';
+  const [mirror, setMirror] = useState(() => {
+    return localStorage.getItem('mirror') || 'archive';
   });
   const [stats, setStats] = useState({ downloads: null, stars: null });
 
   useEffect(() => {
-    localStorage.setItem('useMirror', useMirror);
-  }, [useMirror]);
+    localStorage.setItem('mirror', mirror);
+  }, [mirror]);
 
   useEffect(() => {
     const fetchGitHubStats = async () => {
@@ -39,9 +46,8 @@ function App() {
       return;
     }
 
-    const domain = useMirror ? 'freedium-mirror.cfd' : 'freedium.cfd';
-    const freediumUrl = `https://${domain}/${inputUrl}`;
-    window.open(freediumUrl, '_blank');
+    const selected = MIRRORS.find(m => m.value === mirror) || MIRRORS[0];
+    window.open(selected.base + inputUrl, '_blank');
     setUrl('');
   };
 
@@ -114,15 +120,17 @@ function App() {
           </div>
 
           <div className="options-wrapper">
-            <input
-              type="checkbox"
-              id="mirror-toggle"
-              checked={useMirror}
-              onChange={(e) => setUseMirror(e.target.checked)}
-            />
-            <label htmlFor="mirror-toggle">
-              Use Mirror Server (freedium-mirror.cfd)
-            </label>
+            <label htmlFor="mirror-select">Mirror</label>
+            <select
+              id="mirror-select"
+              value={mirror}
+              onChange={(e) => setMirror(e.target.value)}
+              className="mirror-select"
+            >
+              {MIRRORS.map(m => (
+                <option key={m.value} value={m.value}>{m.label}</option>
+              ))}
+            </select>
           </div>
 
           <div className="button-group">
@@ -147,16 +155,16 @@ function App() {
         <div className="info-card">
           <h3>How it works</h3>
           <ul>
-            <li>Paste any article URL above (Medium or custom domain)</li>
-            <li>Click "Unlock Article" to bypass the paywall</li>
-            <li>Automatically routes through freedium.cfd</li>
-            <li>Download the Android app for mobile access</li>
+            <li>Paste any Medium article URL above</li>
+            <li>Click "Unlock Article" to open via the selected mirror</li>
+            <li>Uses archive.is or other mirrors to access the article</li>
+            <li>Download the Android app for seamless mobile access</li>
             <li>Enjoy unlimited reading!</li>
           </ul>
         </div>
 
         {/* Footer */}
-        <p className="powered-by">Powered by freedium.cfd</p>
+        <p className="powered-by">Made with ♥ by inulute</p>
       </div>
     </div>
   );

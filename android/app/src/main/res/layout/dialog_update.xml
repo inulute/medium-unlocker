@@ -82,45 +82,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:gravity="center_vertical"
             android:orientation="horizontal">
-
-            <!-- Skip Button (left) -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/updateSkipButton"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="Skip"
-                android:textAllCaps="false"
-                android:textColor="@color/text_muted"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
 
             <!-- Cancel Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/updateCancelButton"
                 style="@style/Widget.App.Button.Outlined"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="sans-serif-medium"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp"
-                android:text="Cancel"
+                android:text="Later"
                 android:textSize="14sp" />
 
             <!-- Update Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/updateNowButton"
                 style="@style/Widget.App.Button"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="Update"
                 android:textAllCaps="false"

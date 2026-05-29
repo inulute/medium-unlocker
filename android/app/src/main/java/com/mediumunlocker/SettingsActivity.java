@@ -21,6 +21,20 @@ public class SettingsActivity extends AppCompatActivity {
     static final String PREF_REMEMBER_POSITION = "remember_position";
     static final String PREF_MAX_HISTORY = "max_history";
     static final String PREF_HOME_FEED = "home_feed";
+    static final String PREF_MIRROR = "mirror";
+    static final String DEFAULT_MIRROR = "archive_newest";
+
+    static final String[] MIRROR_LABELS = {"Archive.is", "Archive.is (Alt)", "Freedium", "Freedium Mirror"};
+    static final String[] MIRROR_VALUES = {"archive_newest", "archive_oldest", "freedium", "freedium_mirror"};
+
+    public static String getMirrorBaseUrl(String mirrorValue) {
+        switch (mirrorValue) {
+            case "archive_oldest": return "https://archive.is/oldest/";
+            case "freedium": return "https://freedium.cfd/";
+            case "freedium_mirror": return "https://freedium-mirror.cfd/";
+            default: return "https://archive.is/newest/";
+        }
+    }
 
     private static final String[] FEED_LABELS = {"Recent Articles", "Bookmarks", "Both"};
     private static final String[] FEED_VALUES = {"history", "bookmarks", "both"};
@@ -30,7 +44,9 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial rememberPositionSwitch;
     private TextInputEditText maxHistoryInput;
     private TextView homeFeedValue;
+    private TextView mirrorValue;
     private String selectedFeed = "history";
+    private String selectedMirror = DEFAULT_MIRROR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         rememberPositionSwitch = findViewById(R.id.rememberPositionSwitch);
         maxHistoryInput = findViewById(R.id.maxHistoryInput);
         homeFeedValue = findViewById(R.id.homeFeedValue);
+        mirrorValue = findViewById(R.id.mirrorValue);
 
         loadSettings();
         setupZoomSeekBar();
@@ -65,6 +82,31 @@ public class SettingsActivity extends AppCompatActivity {
         if (homeFeedRow != null) {
             homeFeedRow.setOnClickListener(v -> showFeedPicker());
         }
+
+        View mirrorRow = findViewById(R.id.mirrorRow);
+        if (mirrorRow != null) {
+            mirrorRow.setOnClickListener(v -> showMirrorPicker());
+        }
+    }
+
+    private void showMirrorPicker() {
+        int current = mirrorIndex(selectedMirror);
+        new AlertDialog.Builder(this)
+                .setTitle("Mirror Server")
+                .setSingleChoiceItems(MIRROR_LABELS, current, (dialog, which) -> {
+                    selectedMirror = MIRROR_VALUES[which];
+                    mirrorValue.setText(MIRROR_LABELS[which]);
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private int mirrorIndex(String value) {
+        for (int i = 0; i < MIRROR_VALUES.length; i++) {
+            if (MIRROR_VALUES[i].equals(value)) return i;
+        }
+        return 0;
     }
 
     private void showFeedPicker() {
@@ -101,6 +143,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         selectedFeed = prefs.getString(PREF_HOME_FEED, "history");
         homeFeedValue.setText(FEED_LABELS[feedIndex(selectedFeed)]);
+
+        selectedMirror = prefs.getString(PREF_MIRROR, DEFAULT_MIRROR);
+        if (mirrorValue != null) mirrorValue.setText(MIRROR_LABELS[mirrorIndex(selectedMirror)]);
     }
 
     private void setupZoomSeekBar() {
@@ -132,6 +177,7 @@ public class SettingsActivity extends AppCompatActivity {
                 .putBoolean(PREF_REMEMBER_POSITION, rememberPositionSwitch.isChecked())
                 .putInt(PREF_MAX_HISTORY, maxHistory)
                 .putString(PREF_HOME_FEED, selectedFeed)
+                .putString(PREF_MIRROR, selectedMirror)
                 .apply();
 
         Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show();

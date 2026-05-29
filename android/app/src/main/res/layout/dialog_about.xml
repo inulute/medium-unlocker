@@ -73,29 +73,47 @@
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
 
-        <!-- Powered by Card -->
+        <!-- Made by card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_secondary_rounded"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:gravity="center_vertical">
+            android:orientation="vertical"
+            android:padding="12dp">
 
-            <View
-                android:layout_width="4dp"
-                android:layout_height="24dp"
-                android:background="@color/text_muted" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_heart"
+                    android:tint="@android:color/white"
+                    android:contentDescription="heart" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Made by inulute"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:fontFamily="monospace"
-                android:text="Powered by freedium.cfd"
+                android:layout_marginTop="2dp"
+                android:fontFamily="sans-serif"
+                android:text="Uses archive.is for article access"
                 android:textColor="@color/text_muted"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -136,20 +154,6 @@
 
         </LinearLayout>
 
-        <!-- Close Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/aboutCloseButton"
-            style="@style/Widget.App.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Close"
-            android:textAllCaps="false"
-            android:textColor="@color/background"
-            android:textSize="14sp"
-            app:backgroundTint="@color/primary"
-            app:cornerRadius="16dp" />
 
     </LinearLayout>
 

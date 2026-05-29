@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
             final HistoryManager.HistoryItem finalItem = item;
             card.setOnClickListener(v -> {
                 Intent intent = new Intent(this, WebViewActivity.class);
-                intent.putExtra("url", "https://freedium-mirror.cfd/" + finalItem.originalUrl);
+                intent.putExtra("url", convertToFreedium(finalItem.originalUrl));
                 intent.putExtra("originalUrl", finalItem.originalUrl);
                 startActivity(intent);
             });
@@ -404,7 +404,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String convertToFreedium(String mediumUrl) {
-        return "https://freedium-mirror.cfd/" + mediumUrl;
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String mirror = prefs.getString(SettingsActivity.PREF_MIRROR, SettingsActivity.DEFAULT_MIRROR);
+        return SettingsActivity.getMirrorBaseUrl(mirror) + mediumUrl;
     }
 
     private String extractUrl(String text) {
@@ -668,19 +670,6 @@ public class MainActivity extends AppCompatActivity {
         TextView versionText = dialog.findViewById(R.id.updateVersionText);
         versionText.setText("v" + pendingUpdateVersion + " is now available");
 
-        // Skip button (left)
-        MaterialButton skipButton = dialog.findViewById(R.id.updateSkipButton);
-        skipButton.setOnClickListener(v -> {
-            getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                    .edit()
-                    .putString(PREF_SKIP_VERSION, pendingUpdateVersion)
-                    .apply();
-            updateButton.setVisibility(View.GONE);
-            pendingUpdateVersion = null;
-            pendingUpdateUrl = null;
-            dialog.dismiss();
-        });
-
         // Cancel button
         MaterialButton cancelButton = dialog.findViewById(R.id.updateCancelButton);
         cancelButton.setOnClickListener(v -> dialog.dismiss());
@@ -727,10 +716,6 @@ public class MainActivity extends AppCompatActivity {
             shareApp();
             dialog.dismiss();
         });
-
-        // Close button
-        MaterialButton closeButton = dialog.findViewById(R.id.aboutCloseButton);
-        closeButton.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
     }
