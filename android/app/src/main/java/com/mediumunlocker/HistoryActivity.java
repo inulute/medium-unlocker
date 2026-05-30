@@ -1,6 +1,7 @@
 package com.inulute.mediumunlocker;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -128,8 +129,11 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void openItem(HistoryManager.HistoryItem item) {
+        SharedPreferences prefs = getSharedPreferences("MediumUnlockerPrefs", MODE_PRIVATE);
+        String mirror = prefs.getString(SettingsActivity.PREF_MIRROR, SettingsActivity.DEFAULT_MIRROR);
+        String url = SettingsActivity.getMirrorBaseUrl(mirror) + item.originalUrl;
         Intent intent = new Intent(this, WebViewActivity.class);
-        intent.putExtra("url", "https://freedium-mirror.cfd/" + item.originalUrl);
+        intent.putExtra("url", url);
         intent.putExtra("originalUrl", item.originalUrl);
         startActivity(intent);
     }

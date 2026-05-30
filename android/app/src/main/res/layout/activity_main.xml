@@ -192,26 +192,23 @@
                             android:id="@+id/aboutButton"
                             style="@style/Widget.App.Button.Outlined"
                             android:layout_width="0dp"
-                            android:layout_height="56dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginEnd="12dp"
                             android:layout_weight="1"
-                            android:fontFamily="sans-serif-medium"
                             android:text="About"
                             android:textSize="15sp" />
 
                         <!-- Unlock Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/unlockButton"
+                            style="@style/Widget.App.Button"
                             android:layout_width="0dp"
-                            android:layout_height="56dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:fontFamily="sans-serif-medium"
                             android:text="Unlock Article"
-                            android:textAllCaps="false"
                             android:textColor="@color/background"
                             android:textSize="15sp"
-                            app:backgroundTint="@color/primary"
-                            app:cornerRadius="16dp" />
+                            app:backgroundTint="@color/primary" />
 
                     </LinearLayout>
 

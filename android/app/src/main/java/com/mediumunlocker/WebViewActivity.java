@@ -68,6 +68,7 @@ public class WebViewActivity extends AppCompatActivity {
     private boolean positionRestored = false;
     private int currentMirrorIndex = 0;
     private int startMirrorIndex = 0;
+    private boolean mainFrameError = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,17 @@ public class WebViewActivity extends AppCompatActivity {
         setupButtons();
         loadUrl();
         showUpdateDialogIfNeeded();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        saveReadingPosition();
+        positionRestored = false;
+        currentMirrorIndex = 0;
+        startMirrorIndex = 0;
+        loadUrl();
     }
 
     @Override
@@ -233,6 +245,7 @@ public class WebViewActivity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
                 positionRestored = false;
+                mainFrameError = false;
                 showLoading();
                 errorLayout.setVisibility(View.GONE);
                 webView.setVisibility(View.VISIBLE);
@@ -246,14 +259,18 @@ public class WebViewActivity extends AppCompatActivity {
                 if (loadingOverlay != null) loadingOverlay.setVisibility(View.GONE);
 
                 String title = view.getTitle();
-                if (title != null && !title.isEmpty() && !title.startsWith("http")) {
+                boolean goodTitle = title != null && !title.isEmpty()
+                        && !title.startsWith("http") && !isErrorTitle(title);
+                if (goodTitle) {
                     toolbar.setTitle(title);
                 }
 
-                // Save to history and update bookmark icon
-                if (originalUrl != null && !originalUrl.isEmpty()) {
-                    String pageTitle = (title != null && !title.isEmpty() && !title.startsWith("http")) ? title : "";
-                    historyManager.saveToHistory(pageTitle, originalUrl, url != null ? url : "");
+                // Save to history only on clean loads with real titles
+                if (!mainFrameError && originalUrl != null && !originalUrl.isEmpty()) {
+                    String pageTitle = goodTitle ? title : "";
+                    if (!pageTitle.isEmpty()) {
+                        historyManager.saveToHistory(pageTitle, originalUrl, url != null ? url : "");
+                    }
                     updateBookmarkIcon(historyManager.isBookmarked(originalUrl));
                 }
 
@@ -290,6 +307,7 @@ public class WebViewActivity extends AppCompatActivity {
                         view.loadUrl(nextUrl);
                         return;
                     }
+                    mainFrameError = true;
                     showError();
                 }
             }
@@ -298,7 +316,7 @@ public class WebViewActivity extends AppCompatActivity {
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 String url = error.getUrl();
                 if (url != null && (url.contains("freedium-mirror.cfd") || url.contains("freedium.cfd")
-                        || url.contains("archive.is") || url.contains("archive.ph") || url.contains("archive.today")))
+                        || isArchiveUrl(url)))
                     handler.proceed();
                 else handler.cancel();
             }
@@ -307,8 +325,7 @@ public class WebViewActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 if (url.contains("freedium.cfd") || url.contains("freedium-mirror.cfd")
-                        || url.contains("archive.is") || url.contains("archive.ph") || url.contains("archive.today")
-                        || url.contains("medium.com")) {
+                        || isArchiveUrl(url) || url.contains("medium.com")) {
                     return false;
                 }
                 try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
@@ -327,7 +344,8 @@ public class WebViewActivity extends AppCompatActivity {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
-                if (title != null && !title.isEmpty() && !title.startsWith("http")) {
+                if (isErrorTitle(title) || mainFrameError) return;
+                if (!title.startsWith("http")) {
                     toolbar.setTitle(title);
                     if (originalUrl != null && !originalUrl.isEmpty()) {
                         String currentFreediumUrl = view.getUrl() != null ? view.getUrl() : "";
@@ -385,6 +403,21 @@ public class WebViewActivity extends AppCompatActivity {
 
         if (currentUrl != null && !currentUrl.isEmpty()) webView.loadUrl(currentUrl);
         else showError();
+    }
+
+    private boolean isArchiveUrl(String url) {
+        return url.contains("archive.is") || url.contains("archive.ph")
+                || url.contains("archive.today") || url.contains("archive.fo")
+                || url.contains("archive.li") || url.contains("archive.vn")
+                || url.contains("archive.md");
+    }
+
+    private boolean isErrorTitle(String title) {
+        if (title == null || title.isEmpty()) return true;
+        String lower = title.toLowerCase();
+        return lower.contains("not available") || lower.contains("not found")
+                || lower.contains("can't be reached") || lower.contains("no internet")
+                || lower.contains("err_") || lower.equals("404") || lower.equals("error");
     }
 
     private String getMirrorLabel(int index) {

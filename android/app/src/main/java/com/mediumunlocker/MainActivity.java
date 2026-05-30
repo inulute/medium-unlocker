@@ -395,6 +395,11 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("update_version", updateVersion);
             intent.putExtra("update_url", updateUrl);
         }
+        boolean newWindow = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .getBoolean(SettingsActivity.PREF_NEW_WINDOW, false);
+        if (!newWindow) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        }
         startActivity(intent);
 
         // Clear the input for next use

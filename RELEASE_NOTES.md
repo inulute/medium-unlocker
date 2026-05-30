@@ -1,3 +1,33 @@
+# v2.1.1 (2026-05-30)
+
+---
+
+<div align='center'>
+
+<img src=./assets/medium_unlock_logo.svg width='150px'>
+
+</div>
+
+---
+
+## Fixes
+
+### History & Bookmarks (relates to #5)
+- **Wrong mirror on open** – History and Bookmarks were still redirecting to `freedium-mirror.cfd` regardless of the mirror selected in Settings. Now correctly uses your chosen mirror.
+- **Title corruption** – Article titles in History were being overwritten with "Web page not available" when a mirror had no snapshot. Titles are now preserved on error pages and only updated on successful loads.
+
+### Archive Mirror Handling
+- **Full archive domain family supported** – The WebView now correctly handles all domains archive.is may redirect to: `archive.today`, `archive.ph`, `archive.fo`, `archive.li`, `archive.vn`, `archive.md`. Previously some of these were opening in an external browser.
+
+### Multiple Article Windows (relates to #5)
+- **Duplicate windows on share** – Sharing an article from Medium repeatedly was opening a new app window each time. `MainActivity` is now `singleTop` to prevent duplicate instances.
+- **New setting: Open in New Window** – Settings → Reader now has a toggle to control whether articles open in a new window each time or reuse the existing one (default: reuse).
+
+### UI
+- **Button alignment and text cropping** – The About and Unlock Article buttons on the home screen were misaligned and had different heights due to inconsistent padding and Material3 default insets. Both buttons now use identical sizing with zero insets, and "Unlock Article" text no longer gets cropped.
+
+---
+
 # v2.1 (2026-05-29)
 
 ---
