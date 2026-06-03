@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
         executor = Executors.newSingleThreadExecutor();
 
+        migrateMirrorPref();
+
         initializeViews();
         setupListeners();
         handleIntent(getIntent());
@@ -316,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
                 String url = data.toString();
                 Log.d(TAG, "Received VIEW intent with URL: " + url);
                 processAndOpenUrl(url);
+                finish();
             }
         }
         // Handle text/URL shared via share menu
@@ -327,6 +330,7 @@ public class MainActivity extends AppCompatActivity {
                 if (url != null) {
                     Log.d(TAG, "URL found in shared text: " + url);
                     processAndOpenUrl(url);
+                    finish();
                 } else {
                     Log.w(TAG, "No URL found in shared text");
                     urlInput.setText(sharedText);
@@ -397,14 +401,22 @@ public class MainActivity extends AppCompatActivity {
         }
         boolean newWindow = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .getBoolean(SettingsActivity.PREF_NEW_WINDOW, false);
-        if (!newWindow) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        if (newWindow) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         }
         startActivity(intent);
 
         // Clear the input for next use
         if (urlInput != null) {
             urlInput.setText("");
+        }
+    }
+
+    private void migrateMirrorPref() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String mirror = prefs.getString(SettingsActivity.PREF_MIRROR, SettingsActivity.DEFAULT_MIRROR);
+        if (mirror.startsWith("archive")) {
+            prefs.edit().putString(SettingsActivity.PREF_MIRROR, SettingsActivity.DEFAULT_MIRROR).apply();
         }
     }
 

@@ -53,6 +53,7 @@
         <activity
             android:name=".WebViewActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme"
             android:hardwareAccelerated="true" />
 

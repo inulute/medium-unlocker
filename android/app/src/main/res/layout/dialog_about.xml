@@ -111,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:fontFamily="sans-serif"
-                android:text="Uses archive.is for article access"
+                android:text="Uses freedium.cfd for article access"
                 android:textColor="@color/text_muted"
                 android:textSize="11sp" />
 

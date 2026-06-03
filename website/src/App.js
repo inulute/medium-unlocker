@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const MIRRORS = [
+  { label: 'Freedium Mirror',  value: 'freedium_mirror',base: 'https://freedium-mirror.cfd/' },
+  { label: 'Freedium',         value: 'freedium',       base: 'https://freedium.cfd/' },
   { label: 'Archive.is',       value: 'archive',        base: 'https://archive.is/newest/' },
   { label: 'Archive.is (Alt)', value: 'archive_alt',    base: 'https://archive.is/oldest/' },
-  { label: 'Freedium',         value: 'freedium',       base: 'https://freedium.cfd/' },
-  { label: 'Freedium Mirror',  value: 'freedium_mirror',base: 'https://freedium-mirror.cfd/' },
 ];
 
 function App() {
   const [url, setUrl] = useState('');
   const [mirror, setMirror] = useState(() => {
-    return localStorage.getItem('mirror') || 'archive';
+    return localStorage.getItem('mirror') || 'freedium_mirror';
   });
   const [stats, setStats] = useState({ downloads: null, stars: null });
 
@@ -157,7 +157,7 @@ function App() {
           <ul>
             <li>Paste any Medium article URL above</li>
             <li>Click "Unlock Article" to open via the selected mirror</li>
-            <li>Uses archive.is or other mirrors to access the article</li>
+            <li>Uses freedium.cfd or other mirrors to access the article</li>
             <li>Download the Android app for seamless mobile access</li>
             <li>Enjoy unlimited reading!</li>
           </ul>

@@ -40,10 +40,10 @@ public class WebViewActivity extends AppCompatActivity {
     private static final String PREF_WEBVIEW_POPUP_SHOWN_VERSION = "webview_popup_shown_version";
 
     private static final String[] MIRROR_BASES = {
-        "https://archive.is/newest/",
-        "https://archive.is/oldest/",
+        "https://freedium-mirror.cfd/",
         "https://freedium.cfd/",
-        "https://freedium-mirror.cfd/"
+        "https://archive.is/newest/",
+        "https://archive.is/oldest/"
     };
 
     private HistoryManager historyManager;

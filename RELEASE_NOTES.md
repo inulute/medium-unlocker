@@ -1,3 +1,27 @@
+# v2.1.2 (2026-06-03)
+
+---
+
+<div align='center'>
+
+<img src=./assets/medium_unlock_logo.svg width='150px'>
+
+</div>
+
+---
+
+## Fixes
+
+### Mirror Server
+- **Freedium is back** – Default mirror reverted to Freedium Mirror, with Freedium as the first fallback. Archive.is and Archive.is (Alt) remain available as further fallbacks.
+- **Automatic migration** – Existing users who had Archive.is set as their mirror are automatically switched to Freedium Mirror on next launch.
+
+### Multiple Windows (relates to #5)
+- **Zombie window on share** – Sharing a Medium link was leaving a blank black Medium Unlocker window in recents alongside the article window. MainActivity now closes itself immediately after handing off the URL.
+- **MIUI / custom launchers** – The previous `FLAG_ACTIVITY_REORDER_TO_FRONT` fix was ignored by MIUI's task manager. WebViewActivity is now declared `singleTask`, which is enforced at the framework level and works reliably across all Android skins.
+
+---
+
 # v2.1.1 (2026-05-30)
 
 ---

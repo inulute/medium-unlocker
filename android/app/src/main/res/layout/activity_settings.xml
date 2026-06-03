@@ -380,7 +380,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif"
-                                android:text="Archive.is"
+                                android:text="Freedium Mirror"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="13sp" />
 
@@ -522,7 +522,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
-                                android:text="archive.is"
+                                android:text="freedium.cfd"
                                 android:textColor="@color/text_primary"
                                 android:textSize="14sp" />
 
@@ -531,7 +531,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
                                 android:fontFamily="sans-serif"
-                                android:text="Web archive service used for article access"
+                                android:text="Primary mirror service for article access"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="12sp" />
 

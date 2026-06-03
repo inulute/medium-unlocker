@@ -23,17 +23,17 @@ public class SettingsActivity extends AppCompatActivity {
     static final String PREF_MAX_HISTORY = "max_history";
     static final String PREF_HOME_FEED = "home_feed";
     static final String PREF_MIRROR = "mirror";
-    static final String DEFAULT_MIRROR = "archive_newest";
+    static final String DEFAULT_MIRROR = "freedium_mirror";
 
-    static final String[] MIRROR_LABELS = {"Archive.is", "Archive.is (Alt)", "Freedium", "Freedium Mirror"};
-    static final String[] MIRROR_VALUES = {"archive_newest", "archive_oldest", "freedium", "freedium_mirror"};
+    static final String[] MIRROR_LABELS = {"Freedium Mirror", "Freedium", "Archive.is", "Archive.is (Alt)"};
+    static final String[] MIRROR_VALUES = {"freedium_mirror", "freedium", "archive_newest", "archive_oldest"};
 
     public static String getMirrorBaseUrl(String mirrorValue) {
         switch (mirrorValue) {
-            case "archive_oldest": return "https://archive.is/oldest/";
             case "freedium": return "https://freedium.cfd/";
-            case "freedium_mirror": return "https://freedium-mirror.cfd/";
-            default: return "https://archive.is/newest/";
+            case "archive_newest": return "https://archive.is/newest/";
+            case "archive_oldest": return "https://archive.is/oldest/";
+            default: return "https://freedium-mirror.cfd/";
         }
     }
 
