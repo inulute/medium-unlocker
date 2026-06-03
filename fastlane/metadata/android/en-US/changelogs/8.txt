@@ -1,0 +1,1 @@
+Default mirror reverted to Freedium Mirror (Freedium is back online). Fixed duplicate windows when sharing on MIUI and custom launchers.

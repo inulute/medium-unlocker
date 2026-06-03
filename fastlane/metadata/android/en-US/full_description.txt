@@ -1,0 +1,20 @@
+Medium Unlocker lets you read Medium articles freely by routing them through Freedium and archive mirror services.
+
+Paste any Medium article URL or share it directly from another app — Medium Unlocker opens it instantly through your chosen mirror.
+
+FEATURES
+
+• Mirror selector — choose between Freedium Mirror, Freedium, Archive.is, and Archive.is (Alt)
+• Auto-fallback — if your selected mirror fails, the app automatically tries the next one in order
+• Try Different Mirror button — manually cycle through mirrors from the error screen
+• Reading history — every article you open is saved with its title, domain, and timestamp
+• Bookmarks — bookmark articles while reading and access them from the home screen
+• Home screen feed — recent articles and bookmarks shown at a glance
+• Search — live search across all history and bookmark entries
+• Export / Import — back up and restore history and bookmarks as a JSON file
+• Text zoom — adjust article font size from 50% to 200%
+• Remember reading position — scroll position saved and restored per article
+• Deep link support — Medium links clicked in other apps open directly in Medium Unlocker
+• Share sheet integration — share any Medium link to the app from any browser or app
+
+No accounts. No ads. No tracking. Open source under the MIT license.
